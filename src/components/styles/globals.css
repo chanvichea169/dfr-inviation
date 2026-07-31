@@ -1,0 +1,33 @@
+/* src/app/globals.css or src/styles/globals.css */
+
+/* Khmer Font Definition */
+@font-face {
+  font-family: 'Khmer OS Siemreab';
+  src: url('/fonts/KhmerOSsiemreap.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Global Styles */
+body {
+  font-family: 'Khmer OS Siemreab', 'Khmer OS', 'Moul', 'Noto Sans Khmer', serif;
+}
+
+/* Custom font class */
+.khmer-font {
+  font-family: 'Khmer OS Siemreab', 'Khmer OS', 'Moul', 'Noto Sans Khmer', serif;
+}
+
+/* Optional: Apply to all Khmer text globally */
+.khmer-text {
+  font-family: 'Khmer OS Siemreab', 'Khmer OS', 'Moul', 'Noto Sans Khmer', serif;
+}
+
+/* For better rendering */
+* {
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
