@@ -8,35 +8,50 @@ export function useLocations() {
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      getProvinces(),
-      getDistricts(),
-      getCommunes(),
-      getVillages()
-    ])
-      .then(([p, d, c, v]) => {
-    console.log({
-      provinces: p.length,
-      districts: d.length,
-      communes: c.length,
-      villages: v.length
-    });
+    let cancelled = false;
 
-    setProvinces(p);
-    setDistricts(d);
-    setCommunes(c);
-    setVillages(v);
-
-  })
-      .catch((error) => {
-        console.error("Failed to fetch location data:", error);
-      })
-      .finally(() => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Sequential, not parallel: the MEF API is rate limited, so hitting it
+        // with 4 concurrent paginated streams triggers 429s. Populate each level
+        // as it arrives so the form is usable before villages finish loading.
+        const p = await getProvinces();
+        if (cancelled) return;
+        setProvinces(p);
+        // Provinces are enough to render the form — stop blocking the UI now.
+        // The rest stream in while the user works through step 1.
         setLoading(false);
-      });
+
+        const d = await getDistricts();
+        if (cancelled) return;
+        setDistricts(d);
+
+        const c = await getCommunes();
+        if (cancelled) return;
+        setCommunes(c);
+
+        const v = await getVillages();
+        if (cancelled) return;
+        setVillages(v);
+
+        console.log({ provinces: p.length, districts: d.length, communes: c.length, villages: v.length });
+      } catch (err: any) {
+        if (cancelled) return;
+        console.error("Failed to fetch location data:", err);
+        setError(err?.message || "Failed to load locations");
+        setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return {
@@ -45,5 +60,6 @@ export function useLocations() {
     communes,
     villages,
     loading,
+    error,
   };
 }

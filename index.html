@@ -1,10 +1,68 @@
 <!doctype html>
-<html lang="en">
+<html lang="km">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/dfr.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>នាយកដ្ឋានមុខងារ និងធនធាន</title>
+
+    <title>ប្រព័ន្ធលិខិតអញ្ជើញ · នាយកដ្ឋានមុខងារ និងធនធាន</title>
+    <meta
+      name="description"
+      content="ប្រព័ន្ធបង្កើតលិខិតអញ្ជើញឌីជីថលរបស់នាយកដ្ឋានមុខងារ និងធនធាន — រៀបចំ ពិនិត្យ និងបញ្ជូនលិខិតអញ្ជើញផ្លូវការក្នុងរយៈពេលតែប៉ុន្មាននាទី។"
+    />
+
+    <link rel="icon" type="image/jpeg" href="/logo.jpg" />
+    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <meta
+      name="theme-color"
+      content="#f9fafd"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0d101d"
+      media="(prefers-color-scheme: dark)"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="ប្រព័ន្ធលិខិតអញ្ជើញ · នាយកដ្ឋានមុខងារ និងធនធាន"
+    />
+    <meta
+      property="og:description"
+      content="បង្កើតលិខិតអញ្ជើញផ្លូវការប្រកបដោយវិជ្ជាជីវៈ ក្នុងរយៈពេលតែប៉ុន្មាននាទី។"
+    />
+    <meta property="og:image" content="/logo.jpg" />
+
+    <!-- Kantumruy Pro: variable-weight Khmer + Latin, so headings get real bold
+         weights instead of a synthesised smear. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      href="/fonts/KhmerOSsiemreap.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+
+    <!-- Resolve the theme before first paint so dark users never see a white flash. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var dark =
+            saved === "dark" ||
+            (!saved &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

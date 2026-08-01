@@ -2,20 +2,22 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Calendar, 
-  MapPin, 
-  FileText, 
-  CheckCircle, 
-  ChevronRight, 
-  ChevronLeft, 
-  Send, 
+import {
+  Calendar,
+  MapPin,
+  FileText,
+  CheckCircle,
+  ChevronRight,
+  ChevronLeft,
+  Send,
   Sparkles,
   Clock,
   Building2,
   Download,
   RotateCcw,
-  Edit3
+  Edit3,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import type { Props } from "../interfaces/location";
 
@@ -40,7 +42,8 @@ export default function InvitationForm({
   const [direction, setDirection] = useState(1);
   const [formData, setFormData] = useState<InvitationData>({
     title: "សន្និសីទស្ដីពីការគ្រប់គ្រងធនធានរដ្ឋបាល ២០២៦",
-    description: "គោលបំណងនៃកម្មវិធីនេះគឺដើម្បីពង្រឹងសមត្ថភាពមន្ត្រីរាជការក្នុងការប្រើប្រាស់ប្រព័ន្ធបច្ចេកវិទ្យាទំនើប។",
+    description:
+      "គោលបំណងនៃកម្មវិធីនេះគឺដើម្បីពង្រឹងសមត្ថភាពមន្ត្រីរាជការក្នុងការប្រើប្រាស់ប្រព័ន្ធបច្ចេកវិទ្យាទំនើប។",
     date: "2026-08-15",
     time: "08:30",
     province: "",
@@ -56,12 +59,14 @@ export default function InvitationForm({
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const nextStep = () => {
     setDirection(1);
     setStep((s) => Math.min(s + 1, 4));
   };
-  
+
   const prevStep = () => {
     setDirection(-1);
     setStep((s) => Math.max(s - 1, 1));
@@ -86,19 +91,20 @@ export default function InvitationForm({
 
   const districtList = useMemo(() => {
     return districts.filter(
-      (d) => String(d.province_code).trim() === String(formData.province).trim()
+      (d) =>
+        String(d.province_code).trim() === String(formData.province).trim(),
     );
   }, [formData.province, districts]);
 
   const communeList = useMemo(() => {
     return communes.filter(
-      (c) => Number(c.district_code) === Number(formData.district)
+      (c) => Number(c.district_code) === Number(formData.district),
     );
   }, [formData.district, communes]);
 
   const villageList = useMemo(() => {
     return villages.filter(
-      (v) => Number(v.commune_code) === Number(formData.commune)
+      (v) => Number(v.commune_code) === Number(formData.commune),
     );
   }, [formData.commune, villages]);
 
@@ -106,17 +112,65 @@ export default function InvitationForm({
     { id: 1, name: "ព័ត៌មាន", icon: FileText, desc: "ឈ្មោះ និងការពិពណ៌នា" },
     { id: 2, name: "ទីតាំង", icon: MapPin, desc: "អាសយដ្ឋានរដ្ឋបាល" },
     { id: 3, name: "កាលបរិច្ឆេទ", icon: Calendar, desc: "ថ្ងៃ និងពេលវេលា" },
-    { id: 4, name: "ពិនិត្យ", icon: CheckCircle, desc: "ផ្ទៀងផ្ទាត់ និងបង្កើត" },
+    {
+      id: 4,
+      name: "ពិនិត្យ",
+      icon: CheckCircle,
+      desc: "ផ្ទៀងផ្ទាត់ និងបង្កើត",
+    },
   ];
 
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-  };
+  const getProvinceName = () =>
+    provinces.find((p) => String(p.province_code) === formData.province)
+      ?.province_kh || formData.province;
+  const getDistrictName = () =>
+    districts.find((d) => String(d.district_code) === formData.district)
+      ?.district_kh || formData.district;
+  const getCommuneName = () =>
+    communes.find((c) => String(c.commune_code) === formData.commune)
+      ?.commune_kh || formData.commune;
+  const getVillageName = () =>
+    villages.find((v) => String(v.village_code) === formData.village)
+      ?.village_kh || formData.village;
 
-  const getProvinceName = () => provinces.find(p => String(p.province_code) === formData.province)?.province_kh || formData.province;
-  const getDistrictName = () => districts.find(d => String(d.district_code) === formData.district)?.district_kh || formData.district;
-  const getCommuneName = () => communes.find(c => String(c.commune_code) === formData.commune)?.commune_kh || formData.commune;
-  const getVillageName = () => villages.find(v => String(v.village_code) === formData.village)?.village_kh || formData.village;
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    // Send readable Khmer names to the sheet, not the numeric codes.
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      date: formData.date,
+      time: formData.time,
+      province: getProvinceName(),
+      district: getDistrictName(),
+      commune: getCommuneName(),
+      village: getVillageName(),
+    };
+
+    try {
+      const res = await fetch("/api/invitation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Request failed (${res.status})`);
+      }
+
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(
+        err?.message || "មិនអាចរក្សាទុកទិន្នន័យបានទេ។ សូមព្យាយាមម្ដងទៀត។",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const slideVariants = {
     enter: (dir: number) => ({
@@ -145,10 +199,15 @@ export default function InvitationForm({
           <div className="absolute -top-24 -right-24 w-60 h-60 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+              delay: 0.1,
+            }}
             className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-sky-500 to-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-sky-500/30"
           >
             <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10" />
@@ -158,17 +217,19 @@ export default function InvitationForm({
             បង្កើតបានជោគជ័យ!
           </h2>
           <p className="text-slate-600 text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed">
-            លិខិតអញ្ជើញរបស់អ្នកត្រូវបានរក្សាទុកក្នុងប្រព័ន្ធរួចរាល់ហើយ។ អ្នកអាចទាញយកជាឯកសារ PDF ឬចែករំលែកដោយផ្ទាល់។
+            លិខិតអញ្ជើញរបស់អ្នកត្រូវបានរក្សាទុកក្នុងប្រព័ន្ធរួចរាល់ហើយ។
+            អ្នកអាចទាញយកជាឯកសារ PDF ឬចែករំលែកដោយផ្ទាល់។
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <button className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2">
               <Download size={18} /> ទាញយកជា PDF
             </button>
-            <button 
+            <button
               onClick={() => {
                 setStep(1);
                 setIsSubmitted(false);
+                setSubmitError(null);
               }}
               className="w-full sm:w-auto px-6 py-3 bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-semibold text-sm rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
             >
@@ -186,7 +247,7 @@ export default function InvitationForm({
       <div className="mb-8 px-2 sm:px-4">
         <div className="grid grid-cols-4 gap-1 sm:gap-2 relative">
           <div className="absolute top-5 sm:top-6 left-[12.5%] right-[12.5%] h-0.5 bg-slate-200 -z-0" />
-          <motion.div 
+          <motion.div
             className="absolute top-5 sm:top-6 left-[12.5%] h-0.5 bg-gradient-to-r from-sky-400 to-blue-600 -z-0"
             initial={{ width: "0%" }}
             animate={{ width: `${((step - 1) / (steps.length - 1)) * 75}%` }}
@@ -199,7 +260,10 @@ export default function InvitationForm({
             const isCompleted = step > s.id;
 
             return (
-              <div key={s.id} className="flex flex-col items-center relative z-10">
+              <div
+                key={s.id}
+                className="flex flex-col items-center relative z-10"
+              >
                 <button
                   onClick={() => {
                     if (isCompleted) {
@@ -212,17 +276,21 @@ export default function InvitationForm({
                     isActive
                       ? "bg-gradient-to-tr from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/30 scale-105 sm:scale-110"
                       : isCompleted
-                      ? "bg-sky-100 text-sky-700 hover:bg-sky-200 cursor-pointer"
-                      : "bg-white text-slate-400 border border-slate-200"
+                        ? "bg-sky-100 text-sky-700 hover:bg-sky-200 cursor-pointer"
+                        : "bg-white text-slate-400 border border-slate-200"
                   }`}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <div className="text-center mt-2 sm:mt-3">
-                  <p className={`text-[11px] sm:text-xs font-bold tracking-wide transition-colors line-clamp-1 ${isActive ? "text-sky-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
+                  <p
+                    className={`text-[11px] sm:text-xs font-bold tracking-wide transition-colors line-clamp-1 ${isActive ? "text-sky-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}
+                  >
                     {s.name}
                   </p>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 hidden md:block mt-0.5">{s.desc}</p>
+                  <p className="text-[10px] sm:text-[11px] text-slate-400 hidden md:block mt-0.5">
+                    {s.desc}
+                  </p>
                 </div>
               </div>
             );
@@ -252,8 +320,12 @@ export default function InvitationForm({
                       <FileText size={22} />
                     </div>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">ព័ត៌មានកម្មវិធី</h2>
-                      <p className="text-xs text-slate-500">បំពេញឈ្មោះ និងការពិពណ៌នាអំពីកម្មវិធីរបស់អ្នក</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                        ព័ត៌មានកម្មវិធី
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        បំពេញឈ្មោះ និងការពិពណ៌នាអំពីកម្មវិធីរបស់អ្នក
+                      </p>
                     </div>
                   </div>
 
@@ -280,7 +352,9 @@ export default function InvitationForm({
                         className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all resize-none"
                         placeholder="រៀបរាប់អំពីគោលបំណងនៃកម្មវិធី..."
                         value={formData.description}
-                        onChange={(e) => updateData("description", e.target.value)}
+                        onChange={(e) =>
+                          updateData("description", e.target.value)
+                        }
                       />
                     </div>
                   </div>
@@ -295,8 +369,12 @@ export default function InvitationForm({
                       <MapPin size={22} />
                     </div>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">ទីតាំងប្រារព្ធកម្មវិធី</h2>
-                      <p className="text-xs text-slate-500">ជ្រើសរើសទីតាំងរដ្ឋបាល ឬវាយបញ្ចូលដោយផ្ទាល់</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                        ទីតាំងប្រារព្ធកម្មវិធី
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        ជ្រើសរើសទីតាំងរដ្ឋបាល ឬវាយបញ្ចូលដោយផ្ទាល់
+                      </p>
                     </div>
                   </div>
 
@@ -314,12 +392,19 @@ export default function InvitationForm({
                           updateData("district", "");
                           updateData("commune", "");
                           updateData("village", "");
-                          setManualFields({ district: false, commune: false, village: false });
+                          setManualFields({
+                            district: false,
+                            commune: false,
+                            village: false,
+                          });
                         }}
                       >
                         <option value="">-- ជ្រើសរើសខេត្ត --</option>
                         {provinces.map((p) => (
-                          <option key={p.province_code} value={String(p.province_code)}>
+                          <option
+                            key={p.province_code}
+                            value={String(p.province_code)}
+                          >
                             {p.province_kh}
                           </option>
                         ))}
@@ -333,22 +418,28 @@ export default function InvitationForm({
                           ស្រុក/ខណ្ឌ
                         </label>
                         {formData.province && (
-                          <button 
+                          <button
                             type="button"
                             onClick={() => toggleManual("district")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} /> {manualFields.district ? "ជ្រើសរើសពីបញ្ជី" : "បញ្ចូលដោយដៃ"}
+                            <Edit3 size={11} />{" "}
+                            {manualFields.district
+                              ? "ជ្រើសរើសពីបញ្ជី"
+                              : "បញ្ចូលដោយដៃ"}
                           </button>
                         )}
                       </div>
-                      {manualFields.district || (districtList.length === 0 && formData.province) ? (
+                      {manualFields.district ||
+                      (districtList.length === 0 && formData.province) ? (
                         <input
                           type="text"
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះស្រុក/ខណ្ឌ..."
                           value={formData.district}
-                          onChange={(e) => updateData("district", e.target.value)}
+                          onChange={(e) =>
+                            updateData("district", e.target.value)
+                          }
                         />
                       ) : (
                         <select
@@ -363,7 +454,10 @@ export default function InvitationForm({
                         >
                           <option value="">-- ជ្រើសរើសស្រុក --</option>
                           {districtList.map((d) => (
-                            <option key={d.district_code} value={String(d.district_code)}>
+                            <option
+                              key={d.district_code}
+                              value={String(d.district_code)}
+                            >
                               {d.district_kh}
                             </option>
                           ))}
@@ -378,22 +472,28 @@ export default function InvitationForm({
                           ឃុំ/សង្កាត់
                         </label>
                         {formData.district && (
-                          <button 
+                          <button
                             type="button"
                             onClick={() => toggleManual("commune")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} /> {manualFields.commune ? "ជ្រើសរើសពីបញ្ជី" : "បញ្ចូលដោយដៃ"}
+                            <Edit3 size={11} />{" "}
+                            {manualFields.commune
+                              ? "ជ្រើសរើសពីបញ្ជី"
+                              : "បញ្ចូលដោយដៃ"}
                           </button>
                         )}
                       </div>
-                      {manualFields.commune || (communeList.length === 0 && formData.district) ? (
+                      {manualFields.commune ||
+                      (communeList.length === 0 && formData.district) ? (
                         <input
                           type="text"
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះឃុំ/សង្កាត់..."
                           value={formData.commune}
-                          onChange={(e) => updateData("commune", e.target.value)}
+                          onChange={(e) =>
+                            updateData("commune", e.target.value)
+                          }
                         />
                       ) : (
                         <select
@@ -407,7 +507,10 @@ export default function InvitationForm({
                         >
                           <option value="">-- ជ្រើសរើសឃុំ --</option>
                           {communeList.map((c) => (
-                            <option key={c.commune_code} value={String(c.commune_code)}>
+                            <option
+                              key={c.commune_code}
+                              value={String(c.commune_code)}
+                            >
                               {c.commune_kh}
                             </option>
                           ))}
@@ -422,33 +525,44 @@ export default function InvitationForm({
                           ភូមិ
                         </label>
                         {formData.commune && (
-                          <button 
+                          <button
                             type="button"
                             onClick={() => toggleManual("village")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} /> {manualFields.village ? "ជ្រើសរើសពីបញ្ជី" : "បញ្ចូលដោយដៃ"}
+                            <Edit3 size={11} />{" "}
+                            {manualFields.village
+                              ? "ជ្រើសរើសពីបញ្ជី"
+                              : "បញ្ចូលដោយដៃ"}
                           </button>
                         )}
                       </div>
-                      {manualFields.village || (villageList.length === 0 && formData.commune) ? (
+                      {manualFields.village ||
+                      (villageList.length === 0 && formData.commune) ? (
                         <input
                           type="text"
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះភូមិ..."
                           value={formData.village}
-                          onChange={(e) => updateData("village", e.target.value)}
+                          onChange={(e) =>
+                            updateData("village", e.target.value)
+                          }
                         />
                       ) : (
                         <select
                           disabled={!formData.commune}
                           className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all disabled:opacity-50 disabled:bg-slate-100"
                           value={formData.village}
-                          onChange={(e) => updateData("village", e.target.value)}
+                          onChange={(e) =>
+                            updateData("village", e.target.value)
+                          }
                         >
                           <option value="">-- ជ្រើសរើសភូមិ --</option>
                           {villageList.map((v) => (
-                            <option key={v.village_code} value={String(v.village_code)}>
+                            <option
+                              key={v.village_code}
+                              value={String(v.village_code)}
+                            >
                               {v.village_kh}
                             </option>
                           ))}
@@ -467,8 +581,12 @@ export default function InvitationForm({
                       <Calendar size={22} />
                     </div>
                     <div className="min-w-0">
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">កាលបរិច្ឆេទ និងពេលវេលា</h2>
-                      <p className="text-xs text-slate-500 truncate">កំណត់ពេលវេលាច្បាស់លាស់សម្រាប់កម្មវិធី</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+                        កាលបរិច្ឆេទ និងពេលវេលា
+                      </h2>
+                      <p className="text-xs text-slate-500 truncate">
+                        កំណត់ពេលវេលាច្បាស់លាស់សម្រាប់កម្មវិធី
+                      </p>
                     </div>
                   </div>
 
@@ -514,13 +632,17 @@ export default function InvitationForm({
                       <Sparkles size={22} />
                     </div>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">ពិនិត្យ និងបញ្ចប់</h2>
-                      <p className="text-xs text-slate-500">ផ្ទៀងផ្ទាត់ព័ត៌មានមុនពេលបង្កើតលិខិតអញ្ជើញ</p>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                        ពិនិត្យ និងបញ្ចប់
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        ផ្ទៀងផ្ទាត់ព័ត៌មានមុនពេលបង្កើតលិខិតអញ្ជើញ
+                      </p>
                     </div>
                   </div>
 
                   {/* Dark Glass Card Preview */}
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.98, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-8 bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white shadow-2xl overflow-hidden border border-sky-500/20"
@@ -546,11 +668,20 @@ export default function InvitationForm({
                           <Clock size={16} />
                         </div>
                         <div>
-                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">កាលបរិច្ឆេទ & ម៉ោង</p>
-                          <p className="text-xs font-semibold text-white mt-0.5">
-                            {formData.date ? new Date(formData.date).toLocaleDateString('km-KH', { dateStyle: 'medium' }) : "មិនទាន់កំណត់"}
+                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                            កាលបរិច្ឆេទ & ម៉ោង
                           </p>
-                          <p className="text-xs text-sky-400 font-medium">ម៉ោង {formData.time || "--:--"}</p>
+                          <p className="text-xs font-semibold text-white mt-0.5">
+                            {formData.date
+                              ? new Date(formData.date).toLocaleDateString(
+                                  "km-KH",
+                                  { dateStyle: "medium" },
+                                )
+                              : "មិនទាន់កំណត់"}
+                          </p>
+                          <p className="text-xs text-sky-400 font-medium">
+                            ម៉ោង {formData.time || "--:--"}
+                          </p>
                         </div>
                       </div>
 
@@ -559,12 +690,20 @@ export default function InvitationForm({
                           <MapPin size={16} />
                         </div>
                         <div>
-                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">ទីតាំងប្រារព្ធ</p>
+                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                            ទីតាំងប្រារព្ធ
+                          </p>
                           <p className="text-xs font-semibold text-white mt-0.5">
                             {getProvinceName() || "រាជធានីភ្នំពេញ"}
                           </p>
                           <p className="text-xs text-slate-300 line-clamp-2">
-                            {[getDistrictName(), getCommuneName(), getVillageName()].filter(Boolean).join(", ") || "មិនទាន់កំណត់"}
+                            {[
+                              getDistrictName(),
+                              getCommuneName(),
+                              getVillageName(),
+                            ]
+                              .filter(Boolean)
+                              .join(", ") || "មិនទាន់កំណត់"}
                           </p>
                         </div>
                       </div>
@@ -576,12 +715,20 @@ export default function InvitationForm({
           </AnimatePresence>
         </div>
 
+        {/* Error message */}
+        {submitError && (
+          <div className="mx-4 sm:mx-8 mb-1 flex items-start gap-2 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs sm:text-sm">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
         {/* Navigation Footer */}
         <div className="px-4 sm:px-8 py-4 border-t border-slate-100 bg-slate-50/80 flex justify-between items-center gap-3">
           <button
             type="button"
             onClick={prevStep}
-            disabled={step === 1}
+            disabled={step === 1 || isSubmitting}
             className={`px-4 sm:px-5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5 ${
               step === 1 ? "opacity-0 pointer-events-none" : ""
             }`}
@@ -592,12 +739,24 @@ export default function InvitationForm({
           <button
             type="button"
             onClick={step === 4 ? handleSubmit : nextStep}
-            className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-500/20 active:scale-[0.98] transition-all flex items-center gap-2 shrink-0"
+            disabled={isSubmitting}
+            className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-500/20 active:scale-[0.98] transition-all flex items-center gap-2 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             {step === 4 ? (
-              <>បង្កើតលិខិតអញ្ជើញ <Send size={15} /></>
+              isSubmitting ? (
+                <>
+                  កំពុងរក្សាទុក...{" "}
+                  <Loader2 size={15} className="animate-spin" />
+                </>
+              ) : (
+                <>
+                  បង្កើតលិខិតអញ្ជើញ <Send size={15} />
+                </>
+              )
             ) : (
-              <>បន្តទៅមុខ <ChevronRight size={15} /></>
+              <>
+                បន្តទៅមុខ <ChevronRight size={15} />
+              </>
             )}
           </button>
         </div>
