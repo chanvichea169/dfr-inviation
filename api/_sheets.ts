@@ -15,11 +15,49 @@ export interface InvitationPayload {
   village?: string;
 }
 
+interface GoogleCredentials {
+  clientEmail: string;
+  privateKey: string;
+}
+
 function decodeBase64(value: string): string {
   return Buffer.from(value, "base64").toString("utf8");
 }
 
-function normalizePrivateKey(rawValue: string): string {
+function parseServiceAccountJson(rawValue: string): GoogleCredentials {
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (
+      typeof parsed.client_email === "string" &&
+      typeof parsed.private_key === "string"
+    ) {
+      return {
+        clientEmail: parsed.client_email,
+        privateKey: normalizePrivateKey(parsed.private_key, "service account JSON"),
+      };
+    }
+  } catch {
+    throw new Error(
+      "Google service account JSON could not be parsed. Re-copy the full JSON file content, or use GOOGLE_SERVICE_ACCOUNT_JSON_BASE64.",
+    );
+  }
+
+  throw new Error(
+    "Google service account JSON must include client_email and private_key.",
+  );
+}
+
+function getKeyShape(value: string): Record<string, boolean | number> {
+  return {
+    length: value.length,
+    hasBegin: value.includes("-----BEGIN PRIVATE KEY-----"),
+    hasEnd: value.includes("-----END PRIVATE KEY-----"),
+    hasEscapedNewlines: value.includes("\\n"),
+    lineCount: value.split("\n").length,
+  };
+}
+
+function normalizePrivateKey(rawValue: string, source = "GOOGLE_PRIVATE_KEY"): string {
   let value = rawValue.trim();
 
   if (
@@ -56,43 +94,71 @@ function normalizePrivateKey(rawValue: string): string {
 
   try {
     createPrivateKey(value);
-  } catch {
+  } catch (error: any) {
     throw new Error(
-      "GOOGLE_PRIVATE_KEY could not be decoded by OpenSSL. Re-copy the private_key from the Google service account JSON, keeping the BEGIN/END lines and newline escapes.",
+      `${source} could not be decoded by OpenSSL. Re-copy the private_key from the Google service account JSON, keeping the BEGIN/END lines and newline escapes. Key shape: ${JSON.stringify(getKeyShape(value))}. OpenSSL message: ${error?.message || "unknown"}`,
     );
   }
 
   return value;
 }
 
-export async function appendInvitation(
-  body: InvitationPayload,
-): Promise<{ updatedCells?: number | null }> {
+function loadGoogleCredentials(): GoogleCredentials {
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64) {
+    return parseServiceAccountJson(
+      decodeBase64(process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64),
+    );
+  }
+
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+    return parseServiceAccountJson(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  }
+
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const rawPrivateKey =
     process.env.GOOGLE_PRIVATE_KEY_BASE64 ?
       decodeBase64(process.env.GOOGLE_PRIVATE_KEY_BASE64)
     : process.env.GOOGLE_PRIVATE_KEY;
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
-  console.log("Google ENV check:", {
-    clientEmail: !!clientEmail,
-    privateKey: !!rawPrivateKey,
-    spreadsheetId: !!spreadsheetId,
-  });
-
-  if (!clientEmail || !rawPrivateKey || !spreadsheetId) {
+  if (!clientEmail || !rawPrivateKey) {
     throw new Error(
-      "Missing Google credentials. Set GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64, and GOOGLE_SPREADSHEET_ID.",
+      "Missing Google credentials. Set GOOGLE_SERVICE_ACCOUNT_JSON_BASE64, or set GOOGLE_CLIENT_EMAIL with GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64.",
     );
   }
 
-  const privateKey = normalizePrivateKey(rawPrivateKey);
+  return {
+    clientEmail,
+    privateKey: normalizePrivateKey(
+      rawPrivateKey,
+      process.env.GOOGLE_PRIVATE_KEY_BASE64 ?
+        "GOOGLE_PRIVATE_KEY_BASE64"
+      : "GOOGLE_PRIVATE_KEY",
+    ),
+  };
+}
+
+export async function appendInvitation(
+  body: InvitationPayload,
+): Promise<{ updatedCells?: number | null }> {
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+  const credentials = loadGoogleCredentials();
+
+  console.log("Google ENV check:", {
+    clientEmail: !!credentials.clientEmail,
+    privateKey: !!credentials.privateKey,
+    spreadsheetId: !!spreadsheetId,
+  });
+
+  if (!spreadsheetId) {
+    throw new Error(
+      "Missing Google spreadsheet id. Set GOOGLE_SPREADSHEET_ID.",
+    );
+  }
 
   const auth = new google.auth.GoogleAuth({
     credentials: {
-      client_email: clientEmail,
-      private_key: privateKey,
+      client_email: credentials.clientEmail,
+      private_key: credentials.privateKey,
     },
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
