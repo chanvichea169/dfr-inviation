@@ -21,7 +21,6 @@ export async function appendInvitation(
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
-  // Debug for Vercel logs (does not expose secrets)
   console.log("Google ENV check:", {
     clientEmail: !!clientEmail,
     privateKey: !!rawPrivateKey,
@@ -34,7 +33,20 @@ export async function appendInvitation(
     );
   }
 
-  const privateKey = rawPrivateKey.replace(/\\n/g, "\n");
+  // Support:
+  // 1. Local .env with \n
+  // 2. Vercel multiline environment variables
+  // 3. Quoted environment values
+  const privateKey = rawPrivateKey
+    .replace(/^"|"$/g, "")
+    .replace(/\\n/g, "\n")
+    .trim();
+
+  console.log("Private key format:", {
+    start: privateKey.substring(0, 30),
+    end: privateKey.substring(privateKey.length - 30),
+    length: privateKey.length,
+  });
 
   const auth = new google.auth.GoogleAuth({
     credentials: {
