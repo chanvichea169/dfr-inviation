@@ -34,8 +34,7 @@
     />
     <meta property="og:image" content="/logo.jpg" />
 
-    <!-- Kantumruy Pro: variable-weight Khmer + Latin, so headings get real bold
-         weights instead of a synthesised smear. -->
+    <!-- Kantumruy Pro: variable-weight Khmer + Latin -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -50,7 +49,25 @@
       crossorigin
     />
 
-    <!-- Resolve the theme before first paint so dark users never see a white flash. -->
+    <style>
+      /* Canvas strictly in background */
+      #starfield-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
+      }
+      /* React App rendered above canvas */
+      #root {
+        position: relative;
+        z-index: 1;
+      }
+    </style>
+
+    <!-- Theme detector script -->
     <script>
       (function () {
         try {
@@ -65,7 +82,136 @@
     </script>
   </head>
   <body>
+    <!-- Canvas background layer -->
+    <canvas id="starfield-canvas"></canvas>
+
     <div id="root"></div>
+
+    <!-- Animated Smaller Stars with Khmer Letter Icons -->
+    <script>
+      (function () {
+        const canvas = document.getElementById("starfield-canvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+
+        // Rich colorful star colors
+        const palette = [
+          "rgba(59, 130, 246, ", // Blue
+          "rgba(99, 102, 241, ", // Indigo
+          "rgba(168, 85, 247, ", // Purple
+          "rgba(236, 72, 153, ", // Pink
+          "rgba(20, 184, 166, ", // Teal
+          "rgba(245, 158, 11, ", // Amber
+          "rgba(16, 185, 129, ", // Emerald
+        ];
+
+        // Khmer letters/symbols to present on stars
+        const khmerLetters = ["ល", "អ", "ន", "ធ", "ផ្ល", "វិ", "✦", "★", "✉"];
+
+        let stars = [];
+        const STAR_COUNT = 35; // Balanced count for smaller stars
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          initStars();
+        }
+
+        function initStars() {
+          stars = [];
+          for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              outerRadius: Math.random() * 12 + 10, // Medium-small stars (10px to 22px)
+              innerRadius: Math.random() * 4 + 3,
+              color: palette[Math.floor(Math.random() * palette.length)],
+              letter:
+                khmerLetters[Math.floor(Math.random() * khmerLetters.length)],
+              alpha: Math.random() * 0.5 + 0.3,
+              speed: Math.random() * 0.01 + 0.004,
+              direction: Math.random() > 0.5 ? 1 : -1,
+              rotation: Math.random() * Math.PI,
+              rotationSpeed: (Math.random() - 0.5) * 0.005,
+            });
+          }
+        }
+
+        // Draw 4-point glowing star shape
+        function drawStar(star) {
+          const { x, y, outerRadius, innerRadius, color, alpha, rotation } =
+            star;
+          let rot = rotation;
+          const step = Math.PI / 4;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(
+            x + Math.cos(rot) * outerRadius,
+            y + Math.sin(rot) * outerRadius,
+          );
+
+          for (let i = 0; i < 4; i++) {
+            rot += step;
+            ctx.lineTo(
+              x + Math.cos(rot) * innerRadius,
+              y + Math.sin(rot) * innerRadius,
+            );
+            rot += step;
+            ctx.lineTo(
+              x + Math.cos(rot) * outerRadius,
+              y + Math.sin(rot) * outerRadius,
+            );
+          }
+          ctx.closePath();
+
+          // Soft color fill & glow effect
+          ctx.fillStyle = color + alpha + ")";
+          ctx.shadowColor = color + "0.7)";
+          ctx.shadowBlur = outerRadius * 0.6;
+          ctx.fill();
+
+          // Draw centered letter/symbol on the star
+          ctx.font = `bold ${Math.floor(outerRadius * 0.5)}px 'Kantumruy Pro', 'Khmer OS Siemreap', sans-serif`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(alpha + 0.25, 1)})`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+          ctx.shadowBlur = 2;
+          ctx.fillText(star.letter, x, y);
+
+          ctx.restore();
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          stars.forEach((star) => {
+            // Pulsing Opacity
+            star.alpha += star.speed * star.direction;
+            if (star.alpha >= 0.85) {
+              star.alpha = 0.85;
+              star.direction = -1;
+            } else if (star.alpha <= 0.2) {
+              star.alpha = 0.2;
+              star.direction = 1;
+            }
+
+            // Slight rotation for dynamic sparkle effect
+            star.rotation += star.rotationSpeed;
+
+            drawStar(star);
+          });
+
+          requestAnimationFrame(animate);
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        animate();
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

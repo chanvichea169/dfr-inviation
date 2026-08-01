@@ -32,6 +32,28 @@ interface InvitationData {
   village: string;
 }
 
+const STEPS = [
+  { id: 1, name: "ព័ត៌មាន", icon: FileText, desc: "ឈ្មោះ និងការពិពណ៌នា" },
+  { id: 2, name: "ទីតាំង", icon: MapPin, desc: "អាសយដ្ឋានរដ្ឋបាល" },
+  { id: 3, name: "កាលបរិច្ឆេទ", icon: Calendar, desc: "ថ្ងៃ និងពេលវេលា" },
+  { id: 4, name: "ពិនិត្យ", icon: CheckCircle, desc: "ផ្ទៀងផ្ទាត់ និងបង្កើត" },
+];
+
+const SLIDE_VARIANTS = {
+  enter: (dir: number) => ({
+    x: dir > 0 ? 24 : -24,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (dir: number) => ({
+    x: dir < 0 ? 24 : -24,
+    opacity: 0,
+  }),
+};
+
 export default function InvitationForm({
   provinces = [],
   districts = [],
@@ -77,14 +99,22 @@ export default function InvitationForm({
   };
 
   const toggleManual = (field: "district" | "commune" | "village") => {
-    setManualFields((prev) => ({ ...prev, [field]: !prev[field] }));
+    setManualFields((prev) => {
+      const nextState = { ...prev, [field]: !prev[field] };
+      if (field === "district") {
+        nextState.commune = false;
+        nextState.village = false;
+      } else if (field === "commune") {
+        nextState.village = false;
+      }
+      return nextState;
+    });
+
     updateData(field, "");
     if (field === "district") {
-      setManualFields((p) => ({ ...p, commune: false, village: false }));
       updateData("commune", "");
       updateData("village", "");
     } else if (field === "commune") {
-      setManualFields((p) => ({ ...p, village: false }));
       updateData("village", "");
     }
   };
@@ -108,36 +138,45 @@ export default function InvitationForm({
     );
   }, [formData.commune, villages]);
 
-  const steps = [
-    { id: 1, name: "ព័ត៌មាន", icon: FileText, desc: "ឈ្មោះ និងការពិពណ៌នា" },
-    { id: 2, name: "ទីតាំង", icon: MapPin, desc: "អាសយដ្ឋានរដ្ឋបាល" },
-    { id: 3, name: "កាលបរិច្ឆេទ", icon: Calendar, desc: "ថ្ងៃ និងពេលវេលា" },
-    {
-      id: 4,
-      name: "ពិនិត្យ",
-      icon: CheckCircle,
-      desc: "ផ្ទៀងផ្ទាត់ និងបង្កើត",
-    },
-  ];
-
   const getProvinceName = () =>
     provinces.find((p) => String(p.province_code) === formData.province)
       ?.province_kh || formData.province;
+
   const getDistrictName = () =>
     districts.find((d) => String(d.district_code) === formData.district)
       ?.district_kh || formData.district;
+
   const getCommuneName = () =>
     communes.find((c) => String(c.commune_code) === formData.commune)
       ?.commune_kh || formData.commune;
+
   const getVillageName = () =>
     villages.find((v) => String(v.village_code) === formData.village)
       ?.village_kh || formData.village;
+
+  const formattedLocation = useMemo(() => {
+    const parts = [
+      getVillageName() ? `ភូមិ${getVillageName()}` : "",
+      getCommuneName() ? `ឃុំ/សង្កាត់${getCommuneName()}` : "",
+      getDistrictName() ? `ស្រុក/ខណ្ឌ${getDistrictName()}` : "",
+      getProvinceName() ? `ខេត្ត/ក្រុង${getProvinceName()}` : "",
+    ].filter(Boolean);
+
+    return parts.length > 0 ? parts.join(", ") : "មិនទាន់កំណត់ទីតាំង";
+  }, [formData, provinces, districts, communes, villages]);
+
+  const formattedDate = useMemo(() => {
+    if (!formData.date) return "មិនទាន់កំណត់";
+    const [year, month, day] = formData.date.split("-").map(Number);
+    if (!year || !month || !day) return formData.date;
+    const d = new Date(Date.UTC(year, month - 1, day));
+    return d.toLocaleDateString("km-KH", { dateStyle: "medium" });
+  }, [formData.date]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Send readable Khmer names to the sheet, not the numeric codes.
     const payload = {
       title: formData.title,
       description: formData.description,
@@ -170,28 +209,16 @@ export default function InvitationForm({
       }
 
       setIsSubmitted(true);
-    } catch (err: any) {
-      setSubmitError(
-        err?.message || "មិនអាចរក្សាទុកទិន្នន័យបានទេ។ សូមព្យាយាមម្ដងទៀត។",
-      );
-    } finally {
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "មិនអាចរក្សាទុកទិន្នន័យបានទេ។ សូមព្យាយាមម្ដងទៀត។";
+      setSubmitError(message);
+    }
+    fontEventually: {
       setIsSubmitting(false);
     }
-  };
-
-  const slideVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 20 : -20,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (dir: number) => ({
-      x: dir < 0 ? 20 : -20,
-      opacity: 0,
-    }),
   };
 
   if (isSubmitted) {
@@ -250,18 +277,18 @@ export default function InvitationForm({
 
   return (
     <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
-      {/* Visual Stepper Container */}
+      {/* Visual Stepper */}
       <div className="mb-8 px-2 sm:px-4">
         <div className="grid grid-cols-4 gap-1 sm:gap-2 relative">
           <div className="absolute top-5 sm:top-6 left-[12.5%] right-[12.5%] h-0.5 bg-slate-200 -z-0" />
           <motion.div
             className="absolute top-5 sm:top-6 left-[12.5%] h-0.5 bg-gradient-to-r from-sky-400 to-blue-600 -z-0"
             initial={{ width: "0%" }}
-            animate={{ width: `${((step - 1) / (steps.length - 1)) * 75}%` }}
+            animate={{ width: `${((step - 1) / (STEPS.length - 1)) * 75}%` }}
             transition={{ duration: 0.3 }}
           />
 
-          {steps.map((s) => {
+          {STEPS.map((s) => {
             const Icon = s.icon;
             const isActive = step === s.id;
             const isCompleted = step > s.id;
@@ -272,6 +299,7 @@ export default function InvitationForm({
                 className="flex flex-col items-center relative z-10"
               >
                 <button
+                  type="button"
                   onClick={() => {
                     if (isCompleted) {
                       setDirection(s.id < step ? -1 : 1);
@@ -291,7 +319,13 @@ export default function InvitationForm({
                 </button>
                 <div className="text-center mt-2 sm:mt-3">
                   <p
-                    className={`text-[11px] sm:text-xs font-bold tracking-wide transition-colors line-clamp-1 ${isActive ? "text-sky-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}
+                    className={`text-[11px] sm:text-xs font-bold tracking-wide transition-colors line-clamp-1 ${
+                      isActive
+                        ? "text-sky-700"
+                        : isCompleted
+                          ? "text-slate-800"
+                          : "text-slate-400"
+                    }`}
                   >
                     {s.name}
                   </p>
@@ -312,11 +346,11 @@ export default function InvitationForm({
             <motion.div
               key={step}
               custom={direction}
-              variants={slideVariants}
+              variants={SLIDE_VARIANTS}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
               className="w-full"
             >
               {/* STEP 1 */}
@@ -430,7 +464,7 @@ export default function InvitationForm({
                             onClick={() => toggleManual("district")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} />{" "}
+                            <Edit3 size={11} />
                             {manualFields.district
                               ? "ជ្រើសរើសពីបញ្ជី"
                               : "បញ្ចូលដោយដៃ"}
@@ -484,7 +518,7 @@ export default function InvitationForm({
                             onClick={() => toggleManual("commune")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} />{" "}
+                            <Edit3 size={11} />
                             {manualFields.commune
                               ? "ជ្រើសរើសពីបញ្ជី"
                               : "បញ្ចូលដោយដៃ"}
@@ -537,7 +571,7 @@ export default function InvitationForm({
                             onClick={() => toggleManual("village")}
                             className="text-[11px] sm:text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
                           >
-                            <Edit3 size={11} />{" "}
+                            <Edit3 size={11} />
                             {manualFields.village
                               ? "ជ្រើសរើសពីបញ្ជី"
                               : "បញ្ចូលដោយដៃ"}
@@ -598,34 +632,28 @@ export default function InvitationForm({
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    {/* Date Field */}
                     <div className="min-w-0 w-full">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ថ្ងៃប្រារព្ធ
                       </label>
-                      <div className="relative w-full">
-                        <input
-                          type="date"
-                          className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                          value={formData.date}
-                          onChange={(e) => updateData("date", e.target.value)}
-                        />
-                      </div>
+                      <input
+                        type="date"
+                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                        value={formData.date}
+                        onChange={(e) => updateData("date", e.target.value)}
+                      />
                     </div>
 
-                    {/* Time Field */}
                     <div className="min-w-0 w-full">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ម៉ោងចាប់ផ្ដើម
                       </label>
-                      <div className="relative w-full">
-                        <input
-                          type="time"
-                          className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                          value={formData.time}
-                          onChange={(e) => updateData("time", e.target.value)}
-                        />
-                      </div>
+                      <input
+                        type="time"
+                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                        value={formData.time}
+                        onChange={(e) => updateData("time", e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -648,11 +676,11 @@ export default function InvitationForm({
                     </div>
                   </div>
 
-                  {/* Dark Glass Card Preview */}
+                  {/* Glassmorphism Dark Preview Card */}
                   <motion.div
                     initial={{ scale: 0.98, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-8 bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white shadow-2xl overflow-hidden border border-sky-500/20"
+                    className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-8 bg-slate-900/95 backdrop-blur-md text-white shadow-2xl overflow-hidden border border-sky-500/20"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/20 rounded-full blur-2xl pointer-events-none" />
@@ -679,12 +707,7 @@ export default function InvitationForm({
                             កាលបរិច្ឆេទ & ម៉ោង
                           </p>
                           <p className="text-xs font-semibold text-white mt-0.5">
-                            {formData.date
-                              ? new Date(formData.date).toLocaleDateString(
-                                  "km-KH",
-                                  { dateStyle: "medium" },
-                                )
-                              : "មិនទាន់កំណត់"}
+                            {formattedDate}
                           </p>
                           <p className="text-xs text-sky-400 font-medium">
                             ម៉ោង {formData.time || "--:--"}
@@ -700,72 +723,69 @@ export default function InvitationForm({
                           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                             ទីតាំងប្រារព្ធ
                           </p>
-                          <p className="text-xs font-semibold text-white mt-0.5">
-                            {getProvinceName() || "រាជធានីភ្នំពេញ"}
-                          </p>
-                          <p className="text-xs text-slate-300 line-clamp-2">
-                            {[
-                              getDistrictName(),
-                              getCommuneName(),
-                              getVillageName(),
-                            ]
-                              .filter(Boolean)
-                              .join(", ") || "មិនទាន់កំណត់"}
+                          <p className="text-xs font-medium text-slate-200 mt-0.5 line-clamp-2">
+                            {formattedLocation}
                           </p>
                         </div>
                       </div>
                     </div>
                   </motion.div>
+
+                  {submitError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-rose-700 text-xs"
+                    >
+                      <AlertCircle size={16} className="shrink-0" />
+                      <span>{submitError}</span>
+                    </motion.div>
+                  )}
                 </div>
               )}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Error message */}
-        {submitError && (
-          <div className="mx-4 sm:mx-8 mb-1 flex items-start gap-2 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs sm:text-sm">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            <span>{submitError}</span>
-          </div>
-        )}
-
-        {/* Navigation Footer */}
-        <div className="px-4 sm:px-8 py-4 border-t border-slate-100 bg-slate-50/80 flex justify-between items-center gap-3">
+        {/* Footer Actions */}
+        <div className="p-4 sm:px-8 sm:py-5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={prevStep}
             disabled={step === 1 || isSubmitting}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5 ${
-              step === 1 ? "opacity-0 pointer-events-none" : ""
-            }`}
+            className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={16} /> ថយក្រោយ
           </button>
 
-          <button
-            type="button"
-            onClick={step === 4 ? handleSubmit : nextStep}
-            disabled={isSubmitting}
-            className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-500/20 active:scale-[0.98] transition-all flex items-center gap-2 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
-          >
-            {step === 4 ? (
-              isSubmitting ? (
+          {step < 4 ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={!formData.title.trim()}
+              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-500/20 flex items-center gap-1.5 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              បន្តបន្ទាប់ <ChevronRight size={16} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="px-6 sm:px-8 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {isSubmitting ? (
                 <>
-                  កំពុងរក្សាទុក...{" "}
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />{" "}
+                  កំពុងរក្សាទុក...
                 </>
               ) : (
                 <>
-                  បង្កើតលិខិតអញ្ជើញ <Send size={15} />
+                  <Send size={16} /> បញ្ជាក់ និងបង្កើត
                 </>
-              ) 
-            ) : (
-              <>
-                បន្តទៅមុខ <ChevronRight size={15} />
-              </>
-            )}
-          </button>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
