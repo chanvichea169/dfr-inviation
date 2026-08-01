@@ -10,6 +10,8 @@ function invitationApiPlugin(env: Record<string, string>): Plugin {
     configureServer(server) {
       // Make Sheety configuration from .env available to the shared helper.
       if (env.SHEETY_BEARER_TOKEN) process.env.SHEETY_BEARER_TOKEN ||= env.SHEETY_BEARER_TOKEN
+      if (env.TELEGRAM_BOT_TOKEN) process.env.TELEGRAM_BOT_TOKEN ||= env.TELEGRAM_BOT_TOKEN
+      if (env.TELEGRAM_CHAT_ID) process.env.TELEGRAM_CHAT_ID ||= env.TELEGRAM_CHAT_ID
 
       server.middlewares.use('/api/invitation', async (req, res) => {
         if (req.method !== 'POST') {
@@ -26,11 +28,26 @@ function invitationApiPlugin(env: Record<string, string>): Plugin {
           const body = raw ? JSON.parse(raw) : {}
 
           const { appendInvitation } = await server.ssrLoadModule('/api/_sheets.ts')
+          const { notifyTelegram } = await server.ssrLoadModule('/api/_telegram.ts')
           const result = await appendInvitation(body)
+          let telegramSent = false
+          let telegramError: string | undefined
+
+          try {
+            telegramSent = await notifyTelegram({ invitation: body, rowId: result.id })
+          } catch (notificationError) {
+            telegramError = notificationError instanceof Error ? notificationError.message : String(notificationError)
+            console.error('Telegram notification error:', notificationError)
+          }
 
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify({ success: true, id: result.id }))
+          res.end(JSON.stringify({
+            success: true,
+            id: result.id,
+            telegramSent,
+            ...(telegramError ? { telegramError } : {}),
+          }))
         } catch (error: any) {
           console.error('Invitation API Error:', error)
           res.statusCode = 500

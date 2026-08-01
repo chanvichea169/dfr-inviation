@@ -162,6 +162,13 @@ export default function InvitationForm({
         throw new Error(data.error || `Request failed (${res.status})`);
       }
 
+      if (!data.telegramSent) {
+        throw new Error(
+          data.telegramError ||
+            "Invitation saved, but Telegram notification was not sent.",
+        );
+      }
+
       setIsSubmitted(true);
     } catch (err: any) {
       setSubmitError(

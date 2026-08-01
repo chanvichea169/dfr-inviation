@@ -28,6 +28,19 @@ SHEETY_BEARER_TOKEN=
 
 Only set `SHEETY_BEARER_TOKEN` if your Sheety project requires bearer-token auth.
 
+## Telegram notifications
+
+The `/api/invitation` function sends a formatted Telegram message after a row is saved.
+
+Set these environment variables in Vercel:
+
+```env
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+```
+
+Use your Telegram group ID for `TELEGRAM_CHAT_ID`. If you paste a group ID like `1004465489324`, the API helper sends it to Telegram as `-1004465489324`.
+
 ## Scripts
 
 ```bash
