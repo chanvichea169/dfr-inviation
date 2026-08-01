@@ -122,7 +122,7 @@ function loadGoogleCredentials(): GoogleCredentials {
 
   if (!clientEmail || !rawPrivateKey) {
     throw new Error(
-      "Missing Google credentials. Set GOOGLE_SERVICE_ACCOUNT_JSON_BASE64, or set GOOGLE_CLIENT_EMAIL with GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64.",
+      `Missing Google credentials. Set GOOGLE_SERVICE_ACCOUNT_JSON_BASE64, or set GOOGLE_CLIENT_EMAIL with GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64. Env present: ${JSON.stringify(getCredentialEnvPresence())}`,
     );
   }
 
@@ -137,17 +137,28 @@ function loadGoogleCredentials(): GoogleCredentials {
   };
 }
 
+function getCredentialEnvPresence(): Record<string, boolean> {
+  return {
+    GOOGLE_SERVICE_ACCOUNT_JSON_BASE64:
+      !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64,
+    GOOGLE_SERVICE_ACCOUNT_JSON: !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
+    GOOGLE_CLIENT_EMAIL: !!process.env.GOOGLE_CLIENT_EMAIL,
+    GOOGLE_PRIVATE_KEY: !!process.env.GOOGLE_PRIVATE_KEY,
+    GOOGLE_PRIVATE_KEY_BASE64: !!process.env.GOOGLE_PRIVATE_KEY_BASE64,
+    GOOGLE_SPREADSHEET_ID: !!process.env.GOOGLE_SPREADSHEET_ID,
+  };
+}
+
 export async function appendInvitation(
   body: InvitationPayload,
 ): Promise<{ updatedCells?: number | null }> {
   const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
-  const credentials = loadGoogleCredentials();
 
   console.log("Google ENV check:", {
-    clientEmail: !!credentials.clientEmail,
-    privateKey: !!credentials.privateKey,
-    spreadsheetId: !!spreadsheetId,
+    ...getCredentialEnvPresence(),
   });
+
+  const credentials = loadGoogleCredentials();
 
   if (!spreadsheetId) {
     throw new Error(

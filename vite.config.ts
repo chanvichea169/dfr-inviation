@@ -9,8 +9,11 @@ function invitationApiPlugin(env: Record<string, string>): Plugin {
     apply: 'serve',
     configureServer(server) {
       // Make the Google credentials from .env available to the shared helper.
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 ||= env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON ||= env.GOOGLE_SERVICE_ACCOUNT_JSON
       process.env.GOOGLE_CLIENT_EMAIL ||= env.GOOGLE_CLIENT_EMAIL
       process.env.GOOGLE_PRIVATE_KEY ||= env.GOOGLE_PRIVATE_KEY
+      process.env.GOOGLE_PRIVATE_KEY_BASE64 ||= env.GOOGLE_PRIVATE_KEY_BASE64
       process.env.GOOGLE_SPREADSHEET_ID ||= env.GOOGLE_SPREADSHEET_ID
 
       server.middlewares.use('/api/invitation', async (req, res) => {
