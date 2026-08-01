@@ -1,39 +1,32 @@
 # Invitation App
 
-React/Vite invitation form with a Vercel serverless API that appends submissions to Google Sheets.
+React/Vite invitation form with a Vercel serverless API that appends submissions through Sheety.
 
-## Environment Variables
+## Sheety API
 
-Set these locally in `.env` and in Vercel under Project Settings -> Environment Variables:
+The serverless function posts to:
 
-Recommended Vercel setup:
+```text
+https://api.sheety.co/e47dcae5ed33aa21c3b1cad5e3644552/invitation/sheet1
+```
+
+No Google service-account environment variables are required.
+
+Your Google Sheet first row must contain these exact headers:
+
+```text
+timestamp | title | description | date | time | province | district | commune | village
+```
+
+Sheety only writes values for columns that already exist in the header row. If a header is missing or spelled differently, that cell will stay blank.
+
+Optional Vercel environment variable:
 
 ```env
-GOOGLE_SERVICE_ACCOUNT_JSON_BASE64=base64_encoded_service_account_json
-GOOGLE_SPREADSHEET_ID=your_spreadsheet_id
+SHEETY_BEARER_TOKEN=
 ```
 
-Create `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64` from the downloaded Google service account JSON file with PowerShell:
-
-```powershell
-[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Content .\service-account.json -Raw)))
-```
-
-Alternative separate-value setup:
-
-```env
-GOOGLE_CLIENT_EMAIL=my-service-account@my-project.iam.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-GOOGLE_SPREADSHEET_ID=your_spreadsheet_id
-```
-
-If you only want to encode the private key, base64 encode the full `private_key` value from the Google service account JSON, including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines, then set:
-
-```env
-GOOGLE_PRIVATE_KEY_BASE64=base64_encoded_private_key
-```
-
-Use `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`, or the separate `GOOGLE_CLIENT_EMAIL` plus private key variables.
+Only set `SHEETY_BEARER_TOKEN` if your Sheety project requires bearer-token auth.
 
 ## Scripts
 

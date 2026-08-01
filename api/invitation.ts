@@ -17,11 +17,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const result = await appendInvitation(body);
 
-    return res
-      .status(200)
-      .json({ success: true, updatedCells: result.updatedCells });
+    return res.status(200).json({ success: true, id: result.id });
   } catch (error: any) {
-    console.error("Google Sheets API Error:", error);
+    console.error("Invitation API Error:", error);
     return res.status(500).json({
       success: false,
       error: error?.message || "Failed to append data",

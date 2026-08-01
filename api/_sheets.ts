@@ -1,8 +1,8 @@
-import { google } from "googleapis";
-import { createPrivateKey } from "node:crypto";
-
 // Underscore-prefixed files in /api are NOT deployed as serverless routes by
-// Vercel — this is a shared helper used by api/invitation.ts.
+// Vercel. This is a shared helper used by api/invitation.ts.
+
+const DEFAULT_SHEETY_API_URL =
+  "https://api.sheety.co/e47dcae5ed33aa21c3b1cad5e3644552/invitation/sheet1";
 
 export interface InvitationPayload {
   title?: string;
@@ -15,175 +15,26 @@ export interface InvitationPayload {
   village?: string;
 }
 
-interface GoogleCredentials {
-  clientEmail: string;
-  privateKey: string;
+export interface InvitationAppendResult {
+  id?: number | string;
 }
 
-function decodeBase64(value: string): string {
-  return Buffer.from(value, "base64").toString("utf8");
-}
-
-function parseServiceAccountJson(rawValue: string): GoogleCredentials {
-  try {
-    const parsed = JSON.parse(rawValue);
-    if (
-      typeof parsed.client_email === "string" &&
-      typeof parsed.private_key === "string"
-    ) {
-      return {
-        clientEmail: parsed.client_email,
-        privateKey: normalizePrivateKey(parsed.private_key, "service account JSON"),
-      };
-    }
-  } catch {
-    throw new Error(
-      "Google service account JSON could not be parsed. Re-copy the full JSON file content, or use GOOGLE_SERVICE_ACCOUNT_JSON_BASE64.",
-    );
-  }
-
-  throw new Error(
-    "Google service account JSON must include client_email and private_key.",
-  );
-}
-
-function getKeyShape(value: string): Record<string, boolean | number> {
-  return {
-    length: value.length,
-    hasBegin: value.includes("-----BEGIN PRIVATE KEY-----"),
-    hasEnd: value.includes("-----END PRIVATE KEY-----"),
-    hasEscapedNewlines: value.includes("\\n"),
-    lineCount: value.split("\n").length,
-  };
-}
-
-function normalizePrivateKey(rawValue: string, source = "GOOGLE_PRIVATE_KEY"): string {
-  let value = rawValue.trim();
-
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    value = value.slice(1, -1);
-  }
-
-  if (value.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(value);
-      if (typeof parsed.private_key === "string") {
-        value = parsed.private_key;
-      }
-    } catch {
-      throw new Error(
-        "GOOGLE_PRIVATE_KEY looks like JSON but could not be parsed. Use only the private_key value, or set GOOGLE_PRIVATE_KEY_BASE64.",
-      );
-    }
-  }
-
-  value = value
-    .replace(/\\r\\n/g, "\n")
-    .replace(/\\n/g, "\n")
-    .replace(/\r\n/g, "\n")
-    .trim();
-
-  if (!value.includes("-----BEGIN PRIVATE KEY-----")) {
-    throw new Error(
-      "GOOGLE_PRIVATE_KEY is not a valid PEM private key. In Vercel, paste the private_key value with \\n escapes, or use GOOGLE_PRIVATE_KEY_BASE64.",
-    );
-  }
-
-  if (value.length < 1_000) {
-    throw new Error(
-      `${source} is too short to be a Google service account private key. It looks truncated or still contains a placeholder. Re-copy the complete private_key value from the Google service account JSON, or use GOOGLE_SERVICE_ACCOUNT_JSON_BASE64. Key shape: ${JSON.stringify(getKeyShape(value))}`,
-    );
-  }
-
-  try {
-    createPrivateKey(value);
-  } catch (error: any) {
-    throw new Error(
-      `${source} could not be decoded by OpenSSL. Re-copy the private_key from the Google service account JSON, keeping the BEGIN/END lines and newline escapes. Key shape: ${JSON.stringify(getKeyShape(value))}. OpenSSL message: ${error?.message || "unknown"}`,
-    );
-  }
-
-  return value;
-}
-
-function loadGoogleCredentials(): GoogleCredentials {
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64) {
-    return parseServiceAccountJson(
-      decodeBase64(process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64),
-    );
-  }
-
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-    return parseServiceAccountJson(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-  }
-
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const rawPrivateKey =
-    process.env.GOOGLE_PRIVATE_KEY_BASE64 ?
-      decodeBase64(process.env.GOOGLE_PRIVATE_KEY_BASE64)
-    : process.env.GOOGLE_PRIVATE_KEY;
-
-  if (!clientEmail || !rawPrivateKey) {
-    throw new Error(
-      `Missing Google credentials. Set GOOGLE_SERVICE_ACCOUNT_JSON_BASE64, or set GOOGLE_CLIENT_EMAIL with GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64. Env present: ${JSON.stringify(getCredentialEnvPresence())}`,
-    );
-  }
-
-  return {
-    clientEmail,
-    privateKey: normalizePrivateKey(
-      rawPrivateKey,
-      process.env.GOOGLE_PRIVATE_KEY_BASE64 ?
-        "GOOGLE_PRIVATE_KEY_BASE64"
-      : "GOOGLE_PRIVATE_KEY",
-    ),
-  };
-}
-
-function getCredentialEnvPresence(): Record<string, boolean> {
-  return {
-    GOOGLE_SERVICE_ACCOUNT_JSON_BASE64:
-      !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64,
-    GOOGLE_SERVICE_ACCOUNT_JSON: !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
-    GOOGLE_CLIENT_EMAIL: !!process.env.GOOGLE_CLIENT_EMAIL,
-    GOOGLE_PRIVATE_KEY: !!process.env.GOOGLE_PRIVATE_KEY,
-    GOOGLE_PRIVATE_KEY_BASE64: !!process.env.GOOGLE_PRIVATE_KEY_BASE64,
-    GOOGLE_SPREADSHEET_ID: !!process.env.GOOGLE_SPREADSHEET_ID,
-  };
-}
+const expectedColumns = [
+  "timestamp",
+  "title",
+  "description",
+  "date",
+  "time",
+  "province",
+  "district",
+  "commune",
+  "village",
+];
 
 export async function appendInvitation(
   body: InvitationPayload,
-): Promise<{ updatedCells?: number | null }> {
-  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
-
-  console.log("Google ENV check:", {
-    ...getCredentialEnvPresence(),
-  });
-
-  const credentials = loadGoogleCredentials();
-
-  if (!spreadsheetId) {
-    throw new Error(
-      "Missing Google spreadsheet id. Set GOOGLE_SPREADSHEET_ID.",
-    );
-  }
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: credentials.clientEmail,
-      private_key: credentials.privateKey,
-    },
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-
-  const sheets = google.sheets({
-    version: "v4",
-    auth,
-  });
+): Promise<InvitationAppendResult> {
+  const sheetyBearerToken = process.env.SHEETY_BEARER_TOKEN;
 
   const {
     title,
@@ -196,47 +47,70 @@ export async function appendInvitation(
     village,
   } = body;
 
-  const newRow = [
-    new Date().toISOString(),
-    title ?? "",
-    description ?? "",
-    date ?? "",
-    time ?? "",
-    province ?? "",
-    district ?? "",
-    commune ?? "",
-    village ?? "",
-  ];
+  const sheet1 = {
+    timestamp: new Date().toISOString(),
+    title: title ?? "",
+    description: description ?? "",
+    date: date ?? "",
+    time: time ?? "",
+    province: province ?? "",
+    district: district ?? "",
+    commune: commune ?? "",
+    village: village ?? "",
+  };
 
-  try {
-    const response = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: "Sheet1!A1",
-      valueInputOption: "USER_ENTERED",
-      insertDataOption: "INSERT_ROWS",
-      requestBody: {
-        values: [newRow],
-      },
+  const response = await fetch(DEFAULT_SHEETY_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(sheetyBearerToken ?
+        { Authorization: `Bearer ${sheetyBearerToken}` }
+      : {}),
+    },
+    body: JSON.stringify({
+      sheet1,
+    }),
+  });
+
+  const responseBody = await response.text();
+  const data = responseBody ? JSON.parse(responseBody) : {};
+  const sheetyError =
+    data?.errors?.[0]?.detail || data?.error || data?.message || "";
+
+  if (!response.ok) {
+    console.error("Sheety API Error:", {
+      status: response.status,
+      data,
     });
 
-    console.log("Google Sheet updated:", {
-      updatedCells: response.data.updates?.updatedCells,
-    });
-
-    return {
-      updatedCells: response.data.updates?.updatedCells,
-    };
-  } catch (error: any) {
-    console.error("Google Sheets API Error:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
+    if (sheetyError.includes("POST has been disabled")) {
+      throw new Error(
+        "Sheety POST is disabled for sheet1. Open your Sheety project, select the sheet1 endpoint, and enable POST/Add row for this sheet.",
+      );
+    }
 
     throw new Error(
-      error.response?.data?.error?.message ||
-        error.message ||
-        "Failed to update Google Sheet",
+      sheetyError || `Sheety request failed with status ${response.status}`,
     );
   }
+
+  console.log("Sheety row created:", {
+    id: data?.sheet1?.id,
+    keys: Object.keys(data?.sheet1 || {}),
+  });
+
+  const createdRow = data?.sheet1 || {};
+  const missingColumns = expectedColumns.filter(
+    (column) => !(column in createdRow),
+  );
+
+  if (missingColumns.length > 0) {
+    throw new Error(
+      `Sheety created a row, but these columns were not returned: ${missingColumns.join(", ")}. Make sure the first row in Google Sheets contains these exact headers: ${expectedColumns.join(", ")}.`,
+    );
+  }
+
+  return {
+    id: data?.sheet1?.id,
+  };
 }

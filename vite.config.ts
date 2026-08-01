@@ -8,13 +8,8 @@ function invitationApiPlugin(env: Record<string, string>): Plugin {
     name: 'invitation-api-dev',
     apply: 'serve',
     configureServer(server) {
-      // Make the Google credentials from .env available to the shared helper.
-      process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 ||= env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64
-      process.env.GOOGLE_SERVICE_ACCOUNT_JSON ||= env.GOOGLE_SERVICE_ACCOUNT_JSON
-      process.env.GOOGLE_CLIENT_EMAIL ||= env.GOOGLE_CLIENT_EMAIL
-      process.env.GOOGLE_PRIVATE_KEY ||= env.GOOGLE_PRIVATE_KEY
-      process.env.GOOGLE_PRIVATE_KEY_BASE64 ||= env.GOOGLE_PRIVATE_KEY_BASE64
-      process.env.GOOGLE_SPREADSHEET_ID ||= env.GOOGLE_SPREADSHEET_ID
+      // Make Sheety configuration from .env available to the shared helper.
+      if (env.SHEETY_BEARER_TOKEN) process.env.SHEETY_BEARER_TOKEN ||= env.SHEETY_BEARER_TOKEN
 
       server.middlewares.use('/api/invitation', async (req, res) => {
         if (req.method !== 'POST') {
@@ -35,9 +30,9 @@ function invitationApiPlugin(env: Record<string, string>): Plugin {
 
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify({ success: true, updatedCells: result.updatedCells }))
+          res.end(JSON.stringify({ success: true, id: result.id }))
         } catch (error: any) {
-          console.error('Google Sheets API Error:', error)
+          console.error('Invitation API Error:', error)
           res.statusCode = 500
           res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify({ success: false, error: error?.message || 'Failed to append data' }))
