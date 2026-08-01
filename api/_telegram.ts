@@ -88,11 +88,16 @@ function buildTelegramMessage({
 export async function notifyTelegram(
   input: TelegramNotifyInput,
 ): Promise<boolean> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken =
+    process.env.TELEGRAM_BOT_TOKEN ||
+    "8595782308:AAFQW-v32c8NtPDJev3nj03eM_AYNfAlb50";
+
+  const chatId = process.env.TELEGRAM_CHAT_ID || "-1004465489324";
 
   if (!botToken || !chatId) {
-    throw new Error("Telegram notification is not configured: set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.");
+    throw new Error(
+      "Telegram notification is not configured: set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID.",
+    );
   }
 
   const response = await fetch(
@@ -113,9 +118,11 @@ export async function notifyTelegram(
 
   if (!response.ok) {
     const responseBody = await response.text();
+
     throw new Error(
       `Telegram notification failed with status ${response.status}: ${responseBody}`,
     );
   }
+
   return true;
 }
