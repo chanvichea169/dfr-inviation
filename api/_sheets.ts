@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { createPrivateKey } from "node:crypto";
 
 // Underscore-prefixed files in /api are NOT deployed as serverless routes by
 // Vercel — this is a shared helper used by api/invitation.ts.
@@ -14,10 +15,63 @@ export interface InvitationPayload {
   village?: string;
 }
 
+function decodeBase64(value: string): string {
+  return Buffer.from(value, "base64").toString("utf8");
+}
+
+function normalizePrivateKey(rawValue: string): string {
+  let value = rawValue.trim();
+
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    value = value.slice(1, -1);
+  }
+
+  if (value.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed.private_key === "string") {
+        value = parsed.private_key;
+      }
+    } catch {
+      throw new Error(
+        "GOOGLE_PRIVATE_KEY looks like JSON but could not be parsed. Use only the private_key value, or set GOOGLE_PRIVATE_KEY_BASE64.",
+      );
+    }
+  }
+
+  value = value
+    .replace(/\\r\\n/g, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/\r\n/g, "\n")
+    .trim();
+
+  if (!value.includes("-----BEGIN PRIVATE KEY-----")) {
+    throw new Error(
+      "GOOGLE_PRIVATE_KEY is not a valid PEM private key. In Vercel, paste the private_key value with \\n escapes, or use GOOGLE_PRIVATE_KEY_BASE64.",
+    );
+  }
+
+  try {
+    createPrivateKey(value);
+  } catch {
+    throw new Error(
+      "GOOGLE_PRIVATE_KEY could not be decoded by OpenSSL. Re-copy the private_key from the Google service account JSON, keeping the BEGIN/END lines and newline escapes.",
+    );
+  }
+
+  return value;
+}
+
 export async function appendInvitation(
   body: InvitationPayload,
 ): Promise<{ updatedCells?: number | null }> {
-  const rawPrivateKey = process.env.GOOGLE_PRIVATE_KEY;
+  const rawPrivateKey =
+    process.env.GOOGLE_PRIVATE_KEY_BASE64 ?
+      decodeBase64(process.env.GOOGLE_PRIVATE_KEY_BASE64)
+    : process.env.GOOGLE_PRIVATE_KEY;
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
@@ -29,24 +83,11 @@ export async function appendInvitation(
 
   if (!clientEmail || !rawPrivateKey || !spreadsheetId) {
     throw new Error(
-      "Missing Google credentials. Set GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY and GOOGLE_SPREADSHEET_ID.",
+      "Missing Google credentials. Set GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY or GOOGLE_PRIVATE_KEY_BASE64, and GOOGLE_SPREADSHEET_ID.",
     );
   }
 
-  // Support:
-  // 1. Local .env with \n
-  // 2. Vercel multiline environment variables
-  // 3. Quoted environment values
-  const privateKey = rawPrivateKey
-    .replace(/^"|"$/g, "")
-    .replace(/\\n/g, "\n")
-    .trim();
-
-  console.log("Private key format:", {
-    start: privateKey.substring(0, 30),
-    end: privateKey.substring(privateKey.length - 30),
-    length: privateKey.length,
-  });
+  const privateKey = normalizePrivateKey(rawPrivateKey);
 
   const auth = new google.auth.GoogleAuth({
     credentials: {
