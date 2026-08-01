@@ -92,6 +92,12 @@ function normalizePrivateKey(rawValue: string, source = "GOOGLE_PRIVATE_KEY"): s
     );
   }
 
+  if (value.length < 1_000) {
+    throw new Error(
+      `${source} is too short to be a Google service account private key. It looks truncated or still contains a placeholder. Re-copy the complete private_key value from the Google service account JSON, or use GOOGLE_SERVICE_ACCOUNT_JSON_BASE64. Key shape: ${JSON.stringify(getKeyShape(value))}`,
+    );
+  }
+
   try {
     createPrivateKey(value);
   } catch (error: any) {
