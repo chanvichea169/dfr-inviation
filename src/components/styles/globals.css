@@ -31,3 +31,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* Prevent native mobile date/time inputs from overflowing flex/grid containers */
+input[type="date"],
+input[type="time"] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure WebKit internal picker icons stay contained and aligned */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-left: 0;
+  padding: 0;
+  cursor: pointer;
+}

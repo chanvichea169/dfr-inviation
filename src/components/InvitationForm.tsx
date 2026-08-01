@@ -463,37 +463,44 @@ export default function InvitationForm({
               {step === 3 && (
                 <div className="space-y-5 sm:space-y-6 max-w-2xl mx-auto">
                   <div className="flex items-center gap-3 pb-3 sm:pb-4 border-b border-slate-100">
-                    <div className="p-2.5 sm:p-3 bg-sky-50 text-sky-600 rounded-xl sm:rounded-2xl border border-sky-100">
+                    <div className="p-2.5 sm:p-3 bg-sky-50 text-sky-600 rounded-xl sm:rounded-2xl border border-sky-100 shrink-0">
                       <Calendar size={22} />
                     </div>
-                    <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">កាលបរិច្ឆេទ និងពេលវេលា</h2>
-                      <p className="text-xs text-slate-500">កំណត់ពេលវេលាច្បាស់លាស់សម្រាប់កម្មវិធី</p>
+                    <div className="min-w-0">
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">កាលបរិច្ឆេទ និងពេលវេលា</h2>
+                      <p className="text-xs text-slate-500 truncate">កំណត់ពេលវេលាច្បាស់លាស់សម្រាប់កម្មវិធី</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    <div>
+                    {/* Date Field */}
+                    <div className="min-w-0 w-full">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ថ្ងៃប្រារព្ធ
                       </label>
-                      <input
-                        type="date"
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
-                        value={formData.date}
-                        onChange={(e) => updateData("date", e.target.value)}
-                      />
+                      <div className="relative w-full">
+                        <input
+                          type="date"
+                          className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                          value={formData.date}
+                          onChange={(e) => updateData("date", e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div>
+
+                    {/* Time Field */}
+                    <div className="min-w-0 w-full">
                       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ម៉ោងចាប់ផ្ដើម
                       </label>
-                      <input
-                        type="time"
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
-                        value={formData.time}
-                        onChange={(e) => updateData("time", e.target.value)}
-                      />
+                      <div className="relative w-full">
+                        <input
+                          type="time"
+                          className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                          value={formData.time}
+                          onChange={(e) => updateData("time", e.target.value)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
