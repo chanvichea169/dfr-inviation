@@ -752,7 +752,7 @@ export default function InvitationForm({
                 <>
                   បង្កើតលិខិតអញ្ជើញ <Send size={15} />
                 </>
-              )
+              ) 
             ) : (
               <>
                 បន្តទៅមុខ <ChevronRight size={15} />
