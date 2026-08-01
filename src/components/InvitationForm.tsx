@@ -223,7 +223,7 @@ export default function InvitationForm({
 
   if (isSubmitted) {
     return (
-      <div className="w-full max-w-2xl mx-auto py-12 px-4">
+      <div className="w-full max-w-2xl mx-auto py-8 px-2">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -319,7 +319,7 @@ export default function InvitationForm({
                 </button>
                 <div className="text-center mt-2 sm:mt-3">
                   <p
-                    className={`text-[11px] sm:text-xs font-bold tracking-wide transition-colors line-clamp-1 ${
+                    className={`text-[16px] sm:text-[16px] font-bold tracking-wide transition-colors line-clamp-1 ${
                       isActive
                         ? "text-sky-700"
                         : isCompleted
@@ -329,7 +329,7 @@ export default function InvitationForm({
                   >
                     {s.name}
                   </p>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 hidden md:block mt-0.5">
+                  <p className="text-[14px] sm:text-[12px] text-slate-400 hidden md:block mt-0.5">
                     {s.desc}
                   </p>
                 </div>
@@ -358,7 +358,7 @@ export default function InvitationForm({
                 <div className="space-y-5 sm:space-y-6 max-w-2xl mx-auto">
                   <div className="flex items-center gap-3 pb-3 sm:pb-4 border-b border-slate-100">
                     <div className="p-2.5 sm:p-3 bg-sky-50 text-sky-600 rounded-xl sm:rounded-2xl border border-sky-100">
-                      <FileText size={22} />
+                      <FileText size={26} />
                     </div>
                     <div>
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900">
@@ -372,12 +372,12 @@ export default function InvitationForm({
 
                   <div className="space-y-4 sm:space-y-5">
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                      <label className="block text-md font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ចំណងជើងកម្មវិធី <span className="text-rose-500">*</span>
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
+                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all"
                         placeholder="ឧទាហរណ៍៖ សន្និសីទប្រចាំឆ្នាំ..."
                         value={formData.title}
                         onChange={(e) => updateData("title", e.target.value)}
@@ -385,12 +385,12 @@ export default function InvitationForm({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                      <label className="block text-md font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ការពិពណ៌នាសង្ខេប
                       </label>
                       <textarea
                         rows={4}
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all resize-none"
+                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all resize-none"
                         placeholder="រៀបរាប់អំពីគោលបំណងនៃកម្មវិធី..."
                         value={formData.description}
                         onChange={(e) =>
@@ -410,10 +410,10 @@ export default function InvitationForm({
                       <MapPin size={22} />
                     </div>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                      <h2 className="text-xl sm:text-xl font-bold text-slate-900">
                         ទីតាំងប្រារព្ធកម្មវិធី
                       </h2>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-s text-slate-500">
                         ជ្រើសរើសទីតាំងរដ្ឋបាល ឬវាយបញ្ចូលដោយផ្ទាល់
                       </p>
                     </div>
@@ -422,11 +422,11 @@ export default function InvitationForm({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {/* Province */}
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                      <label className="block text-md font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ខេត្ត/ក្រុង
                       </label>
                       <select
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
+                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all"
                         value={formData.province}
                         onChange={(e) => {
                           updateData("province", e.target.value);
@@ -455,7 +455,7 @@ export default function InvitationForm({
                     {/* District */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        <label className="text-md font-semibold uppercase tracking-wider text-slate-600">
                           ស្រុក/ខណ្ឌ
                         </label>
                         {formData.province && (
@@ -475,7 +475,7 @@ export default function InvitationForm({
                       (districtList.length === 0 && formData.province) ? (
                         <input
                           type="text"
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះស្រុក/ខណ្ឌ..."
                           value={formData.district}
                           onChange={(e) =>
@@ -485,7 +485,7 @@ export default function InvitationForm({
                       ) : (
                         <select
                           disabled={!formData.province}
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all disabled:opacity-50 disabled:bg-slate-100"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all disabled:opacity-50 disabled:bg-slate-100"
                           value={formData.district}
                           onChange={(e) => {
                             updateData("district", e.target.value);
@@ -509,7 +509,7 @@ export default function InvitationForm({
                     {/* Commune */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        <label className="text-md font-semibold uppercase tracking-wider text-slate-600">
                           ឃុំ/សង្កាត់
                         </label>
                         {formData.district && (
@@ -529,7 +529,7 @@ export default function InvitationForm({
                       (communeList.length === 0 && formData.district) ? (
                         <input
                           type="text"
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះឃុំ/សង្កាត់..."
                           value={formData.commune}
                           onChange={(e) =>
@@ -539,7 +539,7 @@ export default function InvitationForm({
                       ) : (
                         <select
                           disabled={!formData.district}
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all disabled:opacity-50 disabled:bg-slate-100"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all disabled:opacity-50 disabled:bg-slate-100"
                           value={formData.commune}
                           onChange={(e) => {
                             updateData("commune", e.target.value);
@@ -562,7 +562,7 @@ export default function InvitationForm({
                     {/* Village */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        <label className="text-md font-semibold uppercase tracking-wider text-slate-600">
                           ភូមិ
                         </label>
                         {formData.commune && (
@@ -582,7 +582,7 @@ export default function InvitationForm({
                       (villageList.length === 0 && formData.commune) ? (
                         <input
                           type="text"
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all"
                           placeholder="វាយបញ្ចូលឈ្មោះភូមិ..."
                           value={formData.village}
                           onChange={(e) =>
@@ -592,7 +592,7 @@ export default function InvitationForm({
                       ) : (
                         <select
                           disabled={!formData.commune}
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all disabled:opacity-50 disabled:bg-slate-100"
+                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all disabled:opacity-50 disabled:bg-slate-100"
                           value={formData.village}
                           onChange={(e) =>
                             updateData("village", e.target.value)
@@ -619,13 +619,13 @@ export default function InvitationForm({
                 <div className="space-y-5 sm:space-y-6 max-w-2xl mx-auto">
                   <div className="flex items-center gap-3 pb-3 sm:pb-4 border-b border-slate-100">
                     <div className="p-2.5 sm:p-3 bg-sky-50 text-sky-600 rounded-xl sm:rounded-2xl border border-sky-100 shrink-0">
-                      <Calendar size={22} />
+                      <Calendar size={26} />
                     </div>
                     <div className="min-w-0">
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+                      <h2 className="text-xl sm:text-xl font-bold text-slate-900 truncate">
                         កាលបរិច្ឆេទ និងពេលវេលា
                       </h2>
-                      <p className="text-xs text-slate-500 truncate">
+                      <p className="text-s text-slate-500 truncate">
                         កំណត់ពេលវេលាច្បាស់លាស់សម្រាប់កម្មវិធី
                       </p>
                     </div>
@@ -633,24 +633,24 @@ export default function InvitationForm({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div className="min-w-0 w-full">
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                      <label className="block text-md font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ថ្ងៃប្រារព្ធ
                       </label>
                       <input
                         type="date"
-                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                         value={formData.date}
                         onChange={(e) => updateData("date", e.target.value)}
                       />
                     </div>
 
                     <div className="min-w-0 w-full">
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                      <label className="block text-md font-semibold uppercase tracking-wider text-slate-600 mb-2">
                         ម៉ោងចាប់ផ្ដើម
                       </label>
                       <input
                         type="time"
-                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-sm transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                        className="w-full min-w-0 block px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 text-md transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                         value={formData.time}
                         onChange={(e) => updateData("time", e.target.value)}
                       />
@@ -664,13 +664,13 @@ export default function InvitationForm({
                 <div className="space-y-5 sm:space-y-6 max-w-2xl mx-auto">
                   <div className="flex items-center gap-3 pb-2">
                     <div className="p-2.5 sm:p-3 bg-sky-50 text-sky-600 rounded-xl sm:rounded-2xl border border-sky-100">
-                      <Sparkles size={22} />
+                      <Sparkles size={26} />
                     </div>
                     <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                      <h2 className="text-xl sm:text-xl font-bold text-slate-900">
                         ពិនិត្យ និងបញ្ចប់
                       </h2>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-s text-slate-500">
                         ផ្ទៀងផ្ទាត់ព័ត៌មានមុនពេលបង្កើតលិខិតអញ្ជើញ
                       </p>
                     </div>
@@ -685,11 +685,11 @@ export default function InvitationForm({
                     <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/20 rounded-full blur-2xl pointer-events-none" />
 
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/20 border border-sky-400/30 rounded-full text-sky-300 text-[11px] font-semibold mb-4 sm:mb-6">
-                      <Building2 size={13} /> លិខិតអញ្ជើញផ្លូវការ
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/20 border border-sky-400/30 rounded-full text-sky-300 text-[14px] font-semibold mb-4 sm:mb-6">
+                      <Building2 size={20} /> លិខិតអញ្ជើញផ្លូវការ
                     </div>
 
-                    <h3 className="text-xl sm:text-2xl font-black text-white leading-snug mb-3">
+                    <h3 className="text-xl sm:text-xl font-black text-white leading-snug mb-3">
                       {formData.title || "ចំណងជើងកម្មវិធី"}
                     </h3>
 
@@ -700,10 +700,10 @@ export default function InvitationForm({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-700/60 pt-5 sm:pt-6">
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-slate-800/80 rounded-xl text-sky-400 border border-slate-700 shrink-0">
-                          <Clock size={16} />
+                          <Clock size={18} />
                         </div>
                         <div>
-                          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          <p className="text-xs uppercase font-bold text-slate-400 tracking-wider">
                             កាលបរិច្ឆេទ & ម៉ោង
                           </p>
                           <p className="text-xs font-semibold text-white mt-0.5">
@@ -717,7 +717,7 @@ export default function InvitationForm({
 
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-slate-800/80 rounded-xl text-blue-400 border border-slate-700 shrink-0">
-                          <MapPin size={16} />
+                          <MapPin size={20} />
                         </div>
                         <div>
                           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
@@ -753,9 +753,9 @@ export default function InvitationForm({
             type="button"
             onClick={prevStep}
             disabled={step === 1 || isSubmitting}
-            className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-md sm:text-sm flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <ChevronLeft size={16} /> ថយក្រោយ
+            <ChevronLeft size={18} /> ថយក្រោយ
           </button>
 
           {step < 4 ? (
@@ -765,23 +765,23 @@ export default function InvitationForm({
               disabled={!formData.title.trim()}
               className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-500/20 flex items-center gap-1.5 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              បន្តបន្ទាប់ <ChevronRight size={16} />
+              បន្តបន្ទាប់ <ChevronRight size={18} />
             </button>
           ) : (
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="px-6 sm:px-8 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="px-6 sm:px-8 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold text-md sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />{" "}
+                  <Loader2 size={18} className="animate-spin" />{" "}
                   កំពុងរក្សាទុក...
                 </>
               ) : (
                 <>
-                  <Send size={16} /> បញ្ជាក់ និងបង្កើត
+                  <Send size={18} /> បញ្ជាក់ និងបង្កើត
                 </>
               )}
             </button>
