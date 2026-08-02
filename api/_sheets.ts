@@ -1,6 +1,10 @@
 // Underscore-prefixed files in /api are NOT deployed as serverless routes by
 // Vercel. This is a shared helper used by api/invitation.ts.
 
+declare const process: {
+  env: Record<string, string | undefined>;
+};
+
 const DEFAULT_SHEETY_API_URL =
   "https://api.sheety.co/e47dcae5ed33aa21c3b1cad5e3644552/invitation/sheet1";
 
@@ -13,6 +17,9 @@ export interface InvitationPayload {
   district?: string;
   commune?: string;
   village?: string;
+  name?: string;
+  role?: string;
+  phone?: string;
 }
 
 export interface InvitationAppendResult {
@@ -23,12 +30,13 @@ const expectedColumns = [
   "timestamp",
   "title",
   "description",
-  "date",
-  "time",
   "province",
   "district",
   "commune",
   "village",
+  "name",
+  "role",
+  "phone",
 ];
 
 export async function appendInvitation(
@@ -39,33 +47,35 @@ export async function appendInvitation(
   const {
     title,
     description,
-    date,
-    time,
     province,
     district,
     commune,
     village,
+    name,
+    role,
+    phone,
   } = body;
 
   const sheet1 = {
     timestamp: new Date().toISOString(),
     title: title ?? "",
     description: description ?? "",
-    date: date ?? "",
-    time: time ?? "",
     province: province ?? "",
     district: district ?? "",
     commune: commune ?? "",
     village: village ?? "",
+    name: name ?? "",
+    role: role ?? "",
+    phone: phone ?? "",
   };
 
   const response = await fetch(DEFAULT_SHEETY_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(sheetyBearerToken ?
-        { Authorization: `Bearer ${sheetyBearerToken}` }
-      : {}),
+      ...(sheetyBearerToken
+        ? { Authorization: `Bearer ${sheetyBearerToken}` }
+        : {}),
     },
     body: JSON.stringify({
       sheet1,

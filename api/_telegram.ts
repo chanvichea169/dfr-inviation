@@ -75,6 +75,13 @@ function buildTelegramMessage({
     "\u{1F4DD} <b>Description</b>",
     formatValue(invitation.description),
     "--------------------",
+    "\u{1F464} <b>Contact</b>",
+    `Name: ${formatValue(invitation.name)}`,
+    `Role: ${formatValue(invitation.role)}`,
+    `Phone: ${formatValue(invitation.phone)}`,
+    "--------------------",
+    rowId ? `Row ID: ${escapeHtml(String(rowId))}` : undefined,
+    "--------------------",
     `Submitted: ${escapeHtml(submittedAt)}`,
   ].join("\n");
 }

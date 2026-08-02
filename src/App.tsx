@@ -116,7 +116,7 @@ export default function App() {
         </header>
 
         {/* Hero Section */}
-        <section className="relative pt-10 pb-12 sm:pt-16 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <section className="relative pt-10 pb-8 sm:pt-16 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export default function App() {
             className="flex flex-col items-center text-center"
           >
             {/* Pill Badge */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
@@ -132,10 +132,10 @@ export default function App() {
             >
               <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
               ប្រព័ន្ធបង្កើតលិខិតអញ្ជើញឌីជីថល
-            </motion.div>
+            </motion.div> */}
 
             {/* Main Avatar / Logo */}
-            <motion.div
+            {/* <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
@@ -147,10 +147,10 @@ export default function App() {
                 alt="Logo"
                 className="relative h-28 w-28 sm:h-36 sm:w-36 rounded-full object-cover ring-4 ring-white shadow-2xl"
               />
-            </motion.div>
+            </motion.div> */}
 
             {/* Main Title */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight max-w-3xl">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight max-w-3xl">
               <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 bg-clip-text text-transparent">
                 នាយកដ្ឋានមុខងារ និងធនធាន
               </span>
@@ -158,8 +158,9 @@ export default function App() {
 
             {/* Subtitle */}
             <p className="text-base sm:text-xl text-slate-600 max-w-2xl leading-relaxed font-medium">
-              បង្កើតលិខិតអញ្ជើញប្រកបដោយវិជ្ជាជីវៈ និងភាពងាយស្រួល
-              ត្រឹមតែប៉ុន្មាននាទីប៉ុណ្ណោះ។
+              ចុះឈ្មោះ
+              និងបង្កើតលិខិតអញ្ជើញឌីជីថលសម្រាប់ការអញ្ជើញទៅកាន់ព្រឹត្តិការណ៍
+              ឬសកម្មភាពផ្សេងៗដោយប្រើប្រព័ន្ធគ្រប់គ្រងលិខិតអញ្ជើញរបស់យើង។
             </p>
           </motion.div>
         </section>
