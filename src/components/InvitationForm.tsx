@@ -51,8 +51,8 @@ const ROLE_OPTIONS = [
 
 const STEPS = [
   { id: 1, name: "ព័ត៌មាន", icon: FileText, desc: "ឈ្មោះ និងការពិពណ៌នា" },
-  { id: 2, name: "ទីតាំង", icon: MapPin, desc: "អាសយដ្ឋានរដ្ឋបាល" },
-  { id: 3, name: "អ្នកចូលរួម", icon: Users, desc: "សមាសភាព ៤ នាក់" },
+  { id: 2, name: "គោលដៅ", icon: MapPin, desc: "អាសយដ្ឋានរដ្ឋបាល" },
+  { id: 3, name: "សមាសភាពអ្នកចូលរួម", icon: Users, desc: "សមាសភាព ៤ នាក់" },
   { id: 4, name: "ពិនិត្យ", icon: CheckCircle, desc: "ផ្ទៀងផ្ទាត់ និងបង្កើត" },
 ];
 
