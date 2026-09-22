@@ -43,7 +43,6 @@ function buildPermissionText(invitation: InvitationPayload): string {
     `ចាប់ពីថ្ងៃទី ៖ ${formatValue(invitation.startDate)}`,
     `ដល់ថ្ងៃទី ៖ ${formatValue(invitation.endDate)}`,
     `មូលហេតុ ៖ ${formatValue(invitation.reason)}`,
-    "",
     "____________________________________",
     `ធ្វើនៅថ្ងៃទី ៖ ${formatValue(invitation.madeAt)}`,
   ].join("\n");

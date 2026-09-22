@@ -136,6 +136,9 @@ export default function PermissionRequestForm() {
       if (field === "startDate" && next.endDate && value > next.endDate) {
         next.endDate = value;
       }
+      if (field === "role" && value !== "ផ្សេងៗ") {
+        next.customRole = "";
+      }
       return next;
     });
   };
@@ -249,7 +252,7 @@ export default function PermissionRequestForm() {
   }
 
   return (
-    <div className="w-full mx-auto px-4 py-6 sm:py-8">
+    <div className="w-full max-w-none mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <form onSubmit={handleSubmit}>
         <section className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-200/80 bg-slate-50/70 px-5 sm:px-7 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -354,21 +357,32 @@ export default function PermissionRequestForm() {
                   />
                 </div>
                 <FieldError message={getError("role")} />
-
-                {formData.role === "ផ្សេងៗ" && (
-                  <div className="pt-1.5">
-                    <input
-                      type="text"
-                      placeholder="សូមបញ្ចូលតួនាទីផ្សេងៗ..."
-                      className={fieldClass(Boolean(getError("customRole")))}
-                      value={formData.customRole}
-                      onBlur={() => markTouched("customRole")}
-                      onChange={(e) => updateData("customRole", e.target.value)}
-                    />
-                    <FieldError message={getError("customRole")} />
-                  </div>
-                )}
               </div>
+
+              {/* តួនាទីផ្សេងៗ (Full Width) */}
+              {formData.role === "ផ្សេងៗ" && (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label
+                    htmlFor="customRole"
+                    className="block text-sm sm:text-base font-semibold text-slate-700"
+                  >
+                    បញ្ជាក់តួនាទីផ្សេងៗ <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="customRole"
+                    type="text"
+                    placeholder="សូមបញ្ចូលតួនាទីផ្សេងៗ..."
+                    className={fieldClass(
+                      Boolean(getError("customRole")),
+                      "w-full",
+                    )}
+                    value={formData.customRole}
+                    onBlur={() => markTouched("customRole")}
+                    onChange={(e) => updateData("customRole", e.target.value)}
+                  />
+                  <FieldError message={getError("customRole")} />
+                </div>
+              )}
 
               {/* ការិយាល័យ */}
               <div className="space-y-1.5 sm:col-span-2">
@@ -416,7 +430,10 @@ export default function PermissionRequestForm() {
                     <input
                       type="text"
                       placeholder="សូមបញ្ចូលការិយាល័យផ្សេងៗ..."
-                      className={fieldClass(Boolean(getError("customOffice")))}
+                      className={fieldClass(
+                        Boolean(getError("customOffice")),
+                        "w-full",
+                      )}
                       value={formData.customOffice}
                       onBlur={() => markTouched("customOffice")}
                       onChange={(e) =>
@@ -477,6 +494,7 @@ export default function PermissionRequestForm() {
                       placeholder="សូមបញ្ជាក់រយៈពេលផ្សេងៗ (ឧទាហរណ៍ 10 ថ្ងៃ)..."
                       className={fieldClass(
                         Boolean(getError("customLeaveDuration")),
+                        "w-full",
                       )}
                       value={formData.customLeaveDuration}
                       onBlur={() => markTouched("customLeaveDuration")}
@@ -489,7 +507,7 @@ export default function PermissionRequestForm() {
                 )}
               </div>
 
-              {/* ចាប់ពីថ្ងៃទី (Fixed Date Picker without Invisible Overlay) */}
+              {/* ចាប់ពីថ្ងៃទី */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="startDate"
@@ -521,7 +539,7 @@ export default function PermissionRequestForm() {
                 <FieldError message={getError("startDate")} />
               </div>
 
-              {/* ដល់ថ្ងៃទី (Fixed Date Picker without Invisible Overlay) */}
+              {/* ដល់ថ្ងៃទី */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="endDate"
@@ -576,6 +594,7 @@ export default function PermissionRequestForm() {
                 <input
                   id="madeAt"
                   type="text"
+                  disabled
                   className={fieldClass(false)}
                   value={madeAt}
                   onBlur={() => markTouched("madeAt")}
