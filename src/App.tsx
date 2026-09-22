@@ -1,76 +1,133 @@
-import InvitationForm from "./components/InvitationForm";
+﻿import PermissionForm from "./components/permission-request/PermissionForm";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 khmer-siemreap selection:bg-sky-600 selection:text-white flex flex-col">
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src="/logo.jpg"
-              alt="Logo"
-              className="h-10 w-10 sm:h-11 sm:w-11 rounded-full object-cover ring-1 ring-slate-200 shadow-sm shrink-0"
-            />
+    <div className="min-h-screen bg-slate-50/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-blue-600 selection:text-white flex flex-col transition-colors duration-200 relative overflow-x-hidden">
+      {/* Background Decorative Gradients & Grid Pattern */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-blue-500/5 via-indigo-500/5 to-transparent pointer-events-none z-0 blur-3xl" />
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+
+      {/* Header Bar */}
+      <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
+          {/* Logo & Department Brand */}
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="relative shrink-0 group">
+              <img
+                src="/logo.jpg"
+                alt="នាយកដ្ឋានមុខងារ និងធនធាន Logo"
+                className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl object-cover ring-2 ring-slate-200/80 dark:ring-slate-700 shadow-md transition-transform duration-300 group-hover:scale-105"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-xs animate-pulse" />
+            </div>
             <div className="min-w-0">
-              <p className="font-bold text-slate-950 text-base sm:text-lg leading-snug truncate">
+              <h2 className="font-extrabold text-slate-950 dark:text-white text-base sm:text-lg leading-snug truncate tracking-tight">
                 នាយកដ្ឋានមុខងារ និងធនធាន
-              </p>
-              <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
                 ប្រព័ន្ធគ្រប់គ្រងលិខិតស្នើសុំអនុញ្ញាតច្បាប់
               </p>
             </div>
           </div>
 
+          {/* Header Action Button */}
           <a
-            href="https://www.telegram.me/vichea_chann"
-            className="min-h-10 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 text-sm sm:text-base font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98]"
+            href="https://t.me/vichea_chann"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:bg-slate-800 dark:hover:bg-blue-500 active:scale-[0.98]"
           >
-            ទំនាក់ទំនង
+            <svg
+              className="w-4 h-4 opacity-90"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            <span>ទំនាក់ទំនងជំនួយ</span>
           </a>
         </div>
       </header>
 
-      <main className="flex-1">
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-3">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 border-b border-slate-200 pb-6">
-            <div className="max-w-3xl">
-              <p className="text-base font-bold text-sky-700 mb-2">
-                Permission Request
-              </p>
-              <h1 className="text-3xl sm:text-5xl font-black text-slate-950 leading-tight">
+      {/* Main Content Area */}
+      <main className="flex-1 relative z-10 flex flex-col">
+        <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 border-b border-slate-200/80 dark:border-slate-800/80 pb-8">
+            {/* Title Section */}
+            <div className="max-w-3xl space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold shadow-2xs">
+                <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                ប្រព័ន្ធដំណើរការធម្មតា
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-4xl font-black text-slate-950 dark:text-white leading-tight tracking-tight">
                 លិខិតស្នើសុំអនុញ្ញាតច្បាប់
               </h1>
-              <p className="mt-3 text-base sm:text-lg text-slate-600 leading-8">
-                បំពេញព័ត៌មាន ផ្ទៀងផ្ទាត់ទម្រង់សំណើ បញ្ជូនទៅប្រព័ន្ធ និងទាញយកជាឯកសារ PDF ផ្លូវការ។
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl font-normal">
+                បំពេញព័ត៌មានលម្អិតអំពីការស្នើសុំ ផ្ទៀងផ្ទាត់ទម្រង់សំណើ
+                បញ្ជូនចូលប្រព័ន្ធ និងទាញយកជាឯកសារ PDF ផ្លូវការសម្រាប់នាយកដ្ឋាន
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-center text-xs font-semibold text-slate-600">
-              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+
+            {/* Visual Workflow Steps */}
+            <div className="flex items-center gap-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 p-2.5 rounded-2xl shadow-sm self-start lg:self-auto">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
+                  1
+                </span>
                 បំពេញ
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+              <span className="text-slate-300 dark:text-slate-700">→</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
+                  2
+                </span>
                 បញ្ជូន
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-                PDF
+              <span className="text-slate-300 dark:text-slate-700">→</span>
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-200/80 dark:border-blue-800 text-xs font-semibold text-blue-700 dark:text-blue-300 shadow-2xs">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
+                  3
+                </span>
+                ទាញយក PDF
               </div>
             </div>
           </div>
         </section>
 
-        <InvitationForm />
+        {/* Permission Request Form Component Container */}
+        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1">
+          <PermissionForm />
+        </div>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
-          <p className="font-semibold text-slate-500 text-sm sm:text-base">
-            © {new Date().getFullYear()} នាយកដ្ឋានមុខងារ និងធនធាន. រក្សាសិទ្ធិគ្រប់យ៉ាង។
+      {/* Footer Section */}
+      <footer className="relative z-10 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
+            © {new Date().getFullYear()} នាយកដ្ឋានមុខងារ និងធនធាន.
+            រក្សាសិទ្ធិគ្រប់យ៉ាង។
           </p>
-          <div className="flex items-center gap-5 text-sm sm:text-base font-semibold text-slate-500">
-            <a href="https://www.telegram.me/vichea_chann" className="hover:text-sky-700 transition-colors">
-              ជំនួយ
+          <div className="flex items-center gap-6 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
+            <a
+              href="https://t.me/vichea_chann"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              ជំនួយបច្ចេកទេស
             </a>
-            <a href="https://www.telegram.me/vichea_chann" className="hover:text-sky-700 transition-colors">
+            <a
+              href="https://t.me/vichea_chann"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
               ទំនាក់ទំនង
             </a>
           </div>
