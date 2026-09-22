@@ -6,17 +6,17 @@ export default {
     extend: {
       fontFamily: {
         // Kantumruy Pro is a variable Khmer/Latin UI face (100–700), so weights
-        // are real rather than synthetically bolded. Khmer OS Siemreab ships in
+        // are real rather than synthetically bolded. Khmer OS Siemreap ships in
         // /public/fonts and covers the case where Google Fonts is unreachable.
         sans: [
           '"Kantumruy Pro"',
-          '"Khmer OS Siemreab"',
+          '"Khmer OS Siemreap"',
           '"Noto Sans Khmer"',
           "ui-sans-serif",
           "system-ui",
           "sans-serif",
         ],
-        siemreap: ['"Khmer OS Siemreab"', '"Kantumruy Pro"', "sans-serif"],
+        siemreap: ['"Khmer OS Siemreap"', '"Kantumruy Pro"', "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
 

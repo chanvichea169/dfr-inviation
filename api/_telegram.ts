@@ -20,25 +20,6 @@ function formatValue(value: string | undefined): string {
   return escapeHtml(value?.trim() || "-");
 }
 
-function formatDate(value: string | undefined): string {
-  if (!value) {
-    return "-";
-  }
-
-  const parsedDate = new Date(`${value}T00:00:00`);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return formatValue(value);
-  }
-
-  return escapeHtml(
-    new Intl.DateTimeFormat("en-GB", {
-      dateStyle: "full",
-      timeZone: "Asia/Phnom_Penh",
-    }).format(parsedDate),
-  );
-}
-
 function normalizeTelegramChatId(chatId: string): string {
   const trimmedChatId = chatId.trim();
 
@@ -47,6 +28,25 @@ function normalizeTelegramChatId(chatId: string): string {
   }
 
   return trimmedChatId;
+}
+
+function buildPermissionText(invitation: InvitationPayload): string {
+  if (invitation.requestText?.trim()) {
+    return formatValue(invitation.requestText);
+  }
+
+  return [
+    `ឈ្មោះ ៖ ${formatValue(invitation.name)}`,
+    `តួនាទី ៖ ${formatValue(invitation.role)}`,
+    `ការិយាល័យ ៖ ${formatValue(invitation.office)}`,
+    `ស្នើសុំអនុញ្ញាតច្បាប់ ៖ ${formatValue(invitation.leaveDuration)}`,
+    `ចាប់ពីថ្ងៃទី ៖ ${formatValue(invitation.startDate)}`,
+    `ដល់ថ្ងៃទី ៖ ${formatValue(invitation.endDate)}`,
+    `មូលហេតុ ៖ ${formatValue(invitation.reason)}`,
+    "",
+    "____________________________________",
+    `ធ្វើនៅថ្ងៃទី ៖ ${formatValue(invitation.madeAt)}`,
+  ].join("\n");
 }
 
 function buildTelegramMessage({
@@ -60,30 +60,12 @@ function buildTelegramMessage({
   }).format(new Date());
 
   return [
-    "\u2728 <b>New Invitation Created</b>",
+    "<b>សំណើសុំអនុញ្ញាតច្បាប់ថ្មី</b>",
     "--------------------",
-    "\u{1F4CC} <b>Title</b>",
-    formatValue(invitation.title),
-    "\u{1F5D3} <b>Schedule</b>",
-    `Date: ${formatDate(invitation.date)}`,
-    `Time: ${formatValue(invitation.time)}`,
-    "\u{1F4CD} <b>Location</b>",
-    `Province: ${formatValue(invitation.province)}`,
-    `District: ${formatValue(invitation.district)}`,
-    `Commune: ${formatValue(invitation.commune)}`,
-    `Village: ${formatValue(invitation.village)}`,
-    "\u{1F4DD} <b>Description</b>",
-    formatValue(invitation.description),
-    "--------------------",
-    "\u{1F464} <b>Contact</b>",
-    `Name: ${formatValue(invitation.name)}`,
-    `Role: ${formatValue(invitation.role)}`,
-    `Phone: ${formatValue(invitation.phone)}`,
-    "--------------------",
-    rowId ? `Row ID: ${escapeHtml(String(rowId))}` : undefined,
-    "--------------------",
-    `Submitted: ${escapeHtml(submittedAt)}`,
-  ].join("\n");
+    buildPermissionText(invitation),
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export async function notifyTelegram(

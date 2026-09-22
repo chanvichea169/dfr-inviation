@@ -7,7 +7,7 @@
    still renders correct Khmer shaping when Google Fonts cannot be reached.
    --------------------------------------------------------------------------- */
 @font-face {
-  font-family: "Khmer OS Siemreab";
+  font-family: "Khmer OS Siemreap";
   src: url("/fonts/KhmerOSsiemreap.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
@@ -67,7 +67,8 @@
     @apply text-ink antialiased;
     background-color: rgb(var(--page));
     /* Khmer script needs extra vertical room for subscripts and diacritics. */
-    line-height: 1.75;
+    font-size: 18px;
+    line-height: 1.8;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -270,12 +271,108 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Print: only the invitation letter reaches the paper.
+   Permission request PDF form.
+   --------------------------------------------------------------------------- */
+.permission-print-form {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  color: #000;
+  pointer-events: none;
+}
+
+.permission-print-page {
+  width: 100%;
+  min-height: 260mm;
+  padding: 0;
+  color: #000;
+  font-family: "Khmer OS Siemreap", serif;
+  font-size: 17pt;
+  line-height: 2;
+}
+
+.permission-print-header {
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.8;
+  margin-bottom: 20mm;
+}
+
+.permission-print-header p {
+  margin: 0;
+}
+
+.permission-print-rule {
+  width: 42mm;
+  height: 1px;
+  margin: 2mm auto 0;
+  background: #000;
+}
+
+.permission-print-page h1 {
+  margin: 0 0 14mm;
+  color: #000;
+  font-size: 21pt;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.8;
+}
+
+.permission-print-fields {
+  display: grid;
+  gap: 3mm;
+}
+
+.permission-print-row {
+  display: grid;
+  grid-template-columns: 48mm 1fr;
+  align-items: start;
+  gap: 4mm;
+}
+
+.permission-print-label {
+  white-space: nowrap;
+}
+
+.permission-print-value {
+  min-height: 9mm;
+  border-bottom: 1px dotted #555;
+  overflow-wrap: anywhere;
+}
+
+.permission-print-footer {
+  margin-top: 18mm;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.permission-print-date {
+  width: 76mm;
+  text-align: center;
+}
+
+.permission-print-signature {
+  margin-top: 8mm;
+  text-align: center;
+}
+
+.permission-print-signature p {
+  margin: 0;
+}
+
+.permission-print-signature div {
+  height: 24mm;
+}
+/* ---------------------------------------------------------------------------
+   Print: only the permission request form reaches the PDF/page.
    --------------------------------------------------------------------------- */
 @media print {
   @page {
     size: A4;
-    margin: 16mm 18mm;
+    margin: 18mm 18mm;
   }
 
   html,
@@ -305,6 +402,11 @@
     background: #fff !important;
     box-shadow: none !important;
     color: #000 !important;
+  }
+
+  .permission-print-form {
+    min-height: auto !important;
+    pointer-events: auto !important;
   }
 
   .print-hide {

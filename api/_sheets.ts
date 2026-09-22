@@ -9,17 +9,15 @@ const DEFAULT_SHEETY_API_URL =
   "https://api.sheety.co/e47dcae5ed33aa21c3b1cad5e3644552/invitation/sheet1";
 
 export interface InvitationPayload {
-  title?: string;
-  description?: string;
-  date?: string;
-  time?: string;
-  province?: string;
-  district?: string;
-  commune?: string;
-  village?: string;
   name?: string;
   role?: string;
-  phone?: string;
+  office?: string;
+  leaveDuration?: string;
+  startDate?: string;
+  endDate?: string;
+  reason?: string;
+  madeAt?: string;
+  requestText?: string;
 }
 
 export interface InvitationAppendResult {
@@ -28,15 +26,15 @@ export interface InvitationAppendResult {
 
 const expectedColumns = [
   "timestamp",
-  "title",
-  "description",
-  "province",
-  "district",
-  "commune",
-  "village",
   "name",
   "role",
-  "phone",
+  "office",
+  "leaveDuration",
+  "startDate",
+  "endDate",
+  "reason",
+  "madeAt",
+  "requestText",
 ];
 
 export async function appendInvitation(
@@ -45,28 +43,28 @@ export async function appendInvitation(
   const sheetyBearerToken = process.env.SHEETY_BEARER_TOKEN;
 
   const {
-    title,
-    description,
-    province,
-    district,
-    commune,
-    village,
     name,
     role,
-    phone,
+    office,
+    leaveDuration,
+    startDate,
+    endDate,
+    reason,
+    madeAt,
+    requestText,
   } = body;
 
   const sheet1 = {
     timestamp: new Date().toISOString(),
-    title: title ?? "",
-    description: description ?? "",
-    province: province ?? "",
-    district: district ?? "",
-    commune: commune ?? "",
-    village: village ?? "",
     name: name ?? "",
     role: role ?? "",
-    phone: phone ?? "",
+    office: office ?? "",
+    leaveDuration: leaveDuration ?? "",
+    startDate: startDate ?? "",
+    endDate: endDate ?? "",
+    reason: reason ?? "",
+    madeAt: madeAt ?? "",
+    requestText: requestText ?? "",
   };
 
   const response = await fetch(DEFAULT_SHEETY_API_URL, {
@@ -115,8 +113,8 @@ export async function appendInvitation(
   );
 
   if (missingColumns.length > 0) {
-    throw new Error(
-      `Sheety created a row, but these columns were not returned: ${missingColumns.join(", ")}. Make sure the first row in Google Sheets contains these exact headers: ${expectedColumns.join(", ")}.`,
+    console.warn(
+      `Sheety created a row, but these columns were not returned: ${missingColumns.join(", ")}. Check the Google Sheets headers if any values are missing.`,
     );
   }
 
