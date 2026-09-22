@@ -489,7 +489,7 @@ export default function PermissionRequestForm() {
                 )}
               </div>
 
-              {/* ចាប់ពីថ្ងៃទី */}
+              {/* ចាប់ពីថ្ងៃទី (Fixed Date Picker without Invisible Overlay) */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="startDate"
@@ -497,29 +497,31 @@ export default function PermissionRequestForm() {
                 >
                   ចាប់ពីថ្ងៃទី <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <Calendar
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
-                  />
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
+                    <Calendar size={18} />
+                  </span>
                   <input
                     id="startDate"
                     type="date"
-                    className={fieldClass(
+                    className={`${fieldClass(
                       Boolean(getError("startDate")),
-                      "pl-10",
-                    )}
+                      "pl-10 pr-10 w-full cursor-pointer",
+                    )}`}
                     value={formData.startDate}
                     onBlur={() => markTouched("startDate")}
                     onChange={(event) =>
                       updateData("startDate", event.target.value)
                     }
                   />
+                  <span className="absolute right-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
+                    <ChevronDown size={16} />
+                  </span>
                 </div>
                 <FieldError message={getError("startDate")} />
               </div>
 
-              {/* ដល់ថ្ងៃទី */}
+              {/* ដល់ថ្ងៃទី (Fixed Date Picker without Invisible Overlay) */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="endDate"
@@ -527,25 +529,27 @@ export default function PermissionRequestForm() {
                 >
                   ដល់ថ្ងៃទី <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <Calendar
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
-                  />
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
+                    <Calendar size={18} />
+                  </span>
                   <input
                     id="endDate"
                     type="date"
                     min={formData.startDate}
-                    className={fieldClass(
+                    className={`${fieldClass(
                       Boolean(getError("endDate")),
-                      "pl-10",
-                    )}
+                      "pl-10 pr-10 w-full cursor-pointer",
+                    )}`}
                     value={formData.endDate}
                     onBlur={() => markTouched("endDate")}
                     onChange={(event) =>
                       updateData("endDate", event.target.value)
                     }
                   />
+                  <span className="absolute right-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
+                    <ChevronDown size={16} />
+                  </span>
                 </div>
                 <FieldError message={getError("endDate")} />
               </div>
