@@ -35,7 +35,7 @@ export default function App() {
             href="https://t.me/vichea_chann"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:bg-slate-800 dark:hover:bg-blue-500 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-blue-700 dark:bg-blue-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:bg-blue-700/80 dark:hover:bg-blue-500 active:scale-[0.98]"
           >
             <svg
               className="w-4 h-4 opacity-90"

@@ -45,10 +45,13 @@ export function SuccessView({
 
         <div className="bg-gradient-to-b from-slate-50/80 to-slate-100/60 border border-slate-200/80 rounded-2xl p-5 sm:p-6 text-left mb-8 shadow-inner">
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-200/60 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            <span>សេចក្តីសង្ខេបសំណើ</span>
-            <span className="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100/50">
+            <p className="text-lg text-blue-500 underline font-weight-500">
+              សេចក្តីសង្ខេបសំណើ
+            </p>
+            <p className="text-md text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100/50 inline-flex items-center gap-1">
+              <CheckCircle />
               បានផ្ទៀងផ្ទាត់
-            </span>
+            </p>
           </div>
           <div
             className="whitespace-pre-wrap break-words text-base sm:text-lg leading-8 text-slate-800 font-normal"
@@ -75,7 +78,7 @@ export function SuccessView({
           <button
             type="button"
             onClick={onReset}
-            className="flex-1 h-12 px-6 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-base rounded-xl transition-all duration-200 hover:border-slate-300 active:scale-[0.98] flex items-center justify-center gap-2.5"
+            className="flex-1 h-13 px-6 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-base rounded-xl transition-all duration-200 hover:border-slate-300 active:scale-[0.98] flex items-center justify-center gap-2.5"
           >
             <RotateCcw
               size={18}

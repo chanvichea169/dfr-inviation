@@ -88,8 +88,7 @@ export function buildRequestText(
     `ចាប់ពីថ្ងៃទី ៖ ${formatKhmerDate(formData.startDate)}`,
     `ដល់ថ្ងៃទី ៖ ${formatKhmerDate(formData.endDate)}`,
     `មូលហេតុ ៖ ${formData.reason || ""}`,
-    "",
-    "____________________________________",
+    "__________________________________",
     `ធ្វើនៅថ្ងៃទី ៖ ${madeAt}`,
   ].join("\n");
 }
