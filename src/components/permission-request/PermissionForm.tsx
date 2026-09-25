@@ -252,7 +252,7 @@ export default function PermissionRequestForm() {
   }
 
   return (
-    <div className="w-full max-w-none mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div className="w-full max-w-none mx-auto sm:px-6 py-6 sm:py-8">
       <form onSubmit={handleSubmit}>
         <section className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
           <div className="border-b border-slate-200/80 bg-slate-50/70 px-5 sm:px-7 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -343,7 +343,7 @@ export default function PermissionRequestForm() {
                     onChange={(event) => updateData("role", event.target.value)}
                   >
                     <option value="" disabled>
-                      -- ជ្រើសរើសតួនាទី --
+                      ជ្រើសរើសតួនាទី
                     </option>
                     {ROLES.map((role) => (
                       <option key={role} value={role}>
@@ -410,7 +410,7 @@ export default function PermissionRequestForm() {
                     }
                   >
                     <option value="" disabled>
-                      -- ជ្រើសរើសការិយាល័យ --
+                      ជ្រើសរើសការិយាល័យ
                     </option>
                     {OFFICES.map((office) => (
                       <option key={office} value={office}>
@@ -472,7 +472,7 @@ export default function PermissionRequestForm() {
                     }
                   >
                     <option value="" disabled>
-                      -- ជ្រើសរើសចំនួនថ្ងៃ/រយៈពេល --
+                      ជ្រើសរើសចំនួនថ្ងៃ/រយៈពេល
                     </option>
                     {DURATION_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>

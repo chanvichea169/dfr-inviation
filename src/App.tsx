@@ -57,9 +57,8 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 relative z-10 flex flex-col">
-        <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6">
+        {/* <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 border-b border-slate-200/80 dark:border-slate-800/80 pb-8">
-            {/* Title Section */}
             <div className="max-w-3xl space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold shadow-2xs">
                 <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
@@ -68,37 +67,9 @@ export default function App() {
               <h1 className="text-3xl sm:text-4xl lg:text-4xl font-black text-slate-950 dark:text-white leading-tight tracking-tight">
                 លិខិតស្នើសុំអនុញ្ញាតច្បាប់
               </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl font-normal">
-                បំពេញព័ត៌មានលម្អិតអំពីការស្នើសុំ ផ្ទៀងផ្ទាត់ទម្រង់សំណើ
-                បញ្ជូនចូលប្រព័ន្ធ និងទាញយកជាឯកសារ PDF ផ្លូវការសម្រាប់នាយកដ្ឋាន
-              </p>
-            </div>
-
-            {/* Visual Workflow Steps */}
-            <div className="flex items-center gap-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 p-2.5 rounded-2xl shadow-sm self-start lg:self-auto">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
-                  1
-                </span>
-                បំពេញ
-              </div>
-              <span className="text-slate-300 dark:text-slate-700">→</span>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
-                  2
-                </span>
-                បញ្ជូន
-              </div>
-              <span className="text-slate-300 dark:text-slate-700">→</span>
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-200/80 dark:border-blue-800 text-xs font-semibold text-blue-700 dark:text-blue-300 shadow-2xs">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-bold">
-                  3
-                </span>
-                ទាញយក PDF
-              </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Permission Request Form Component Container */}
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1">
