@@ -38,22 +38,15 @@ export default function App() {
             className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-blue-600 bg-transparent px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-blue-700 transition-all duration-200 hover:bg-blue-50 hover:border-blue-700 hover:text-blue-800 active:scale-[0.98] dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-950/40 dark:hover:border-blue-400 dark:hover:text-blue-300"
           >
             <svg
-              className="w-4 h-4 opacity-90"
-              fill="none"
-              stroke="currentColor"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
+              <path d="M21.5 3.5 2.9 10.7c-1.27.5-1.26 1.2-.23 1.5l4.77 1.49 1.83 5.67c.22.61.11.86.75.86.49 0 .71-.22.98-.48l2.32-2.25 4.83 3.57c.89.49 1.53.23 1.75-.83l3.16-14.89c.32-1.31-.5-1.9-1.56-1.34ZM8.17 13.3l10.83-6.83c.51-.31.98-.14.59.19l-8.77 7.91-.34 3.39-2.31-4.66Z" />
             </svg>
 
-            <span className="font-extrabold text-slate-950 dark:text-white text-base sm:text-md leading-snug truncate tracking-tight">
-              ទំនាក់ទំនងជំនួយ
-            </span>
+            <span>ទំនាក់ទំនងជំនួយ</span>
           </a>
         </div>
       </header>
