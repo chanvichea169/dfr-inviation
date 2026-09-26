@@ -318,61 +318,76 @@ export default function PermissionRequestForm() {
   }
 
   return (
-    <div className="w-full max-w-none mx-auto px-3 sm:px-6 py-4 sm:py-8">
+    <div className="w-full max-w-5xl mx-auto px-0 sm:px-4 lg:px-6 py-3 sm:py-8">
       <form onSubmit={handleSubmit}>
-        <section className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-          <div className="border-b border-slate-200/80 bg-slate-50/70 px-4 sm:px-7 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                <FileText size={22} />
+        <section className="overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_40px_-16px_rgba(15,23,42,0.18)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95">
+          {/* Header */}
+          <div className="relative overflow-hidden border-b border-slate-200/80 px-4 py-5 sm:px-7 sm:py-6 dark:border-slate-800">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/40 dark:from-blue-950/30 dark:via-slate-900 dark:to-indigo-950/20" />
+
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3.5">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/20">
+                  <FileText size={21} strokeWidth={2.2} />
+                </div>
+
+                <div className="min-w-0">
+                  <h2 className="truncate text-lg font-extrabold tracking-tight text-slate-950 sm:text-2xl dark:text-white">
+                    លិខិតស្នើសុំអនុញ្ញាតច្បាប់
+                  </h2>
+
+                  <p className="mt-0.5 truncate text-xs font-medium text-slate-500 sm:text-sm dark:text-slate-400">
+                    ព័ត៌មានស្នើសុំ និងការផ្ទៀងផ្ទាត់មុនបញ្ជូន
+                  </p>
+                </div>
               </div>
 
-              <div className="min-w-0">
-                <h2 className="text-lg sm:text-2xl font-bold text-slate-950 leading-snug">
-                  លិខិតស្នើសុំអនុញ្ញាតច្បាប់
-                </h2>
+              <div className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
+                  <Clock size={13} />
+                  {selectedTotalDays !== null
+                    ? `${selectedTotalDays} ថ្ងៃ`
+                    : "មិនទាន់កំណត់"}
+                </div>
 
-                <p className="text-sm sm:text-base text-slate-500 leading-relaxed">
-                  ព័ត៌មានស្នើសុំ និងការផ្ទៀងផ្ទាត់មុនបញ្ជូន
-                </p>
+                <div
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${
+                    hasErrors || Boolean(durationMismatchWarning)
+                      ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      hasErrors || Boolean(durationMismatchWarning)
+                        ? "bg-amber-500"
+                        : "bg-emerald-500"
+                    }`}
+                  />
+                  {hasErrors || Boolean(durationMismatchWarning)
+                    ? "ត្រូវពិនិត្យ"
+                    : "រួចរាល់"}
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600">
-              <span className="rounded-full bg-white border border-slate-200 px-3 py-1 shadow-2xs">
-                {selectedTotalDays !== null
-                  ? `${selectedTotalDays} ថ្ងៃ`
-                  : "មិនទាន់កំណត់"}
-              </span>
-
-              <span
-                className={`rounded-full border px-3 py-1 ${
-                  hasErrors || Boolean(durationMismatchWarning)
-                    ? "bg-amber-50 border-amber-200 text-amber-700"
-                    : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                }`}
-              >
-                {hasErrors || Boolean(durationMismatchWarning)
-                  ? "ត្រូវពិនិត្យ"
-                  : "រួចរាល់"}
-              </span>
             </div>
           </div>
 
-          <div className="p-4 sm:p-7 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5">
+          {/* Form */}
+          <div className="p-4 sm:p-7">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              {/* Name */}
+              <div className="space-y-2">
                 <label
                   htmlFor="name"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
+                  className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                 >
                   ឈ្មោះ <span className="text-rose-500">*</span>
                 </label>
 
                 <div className="relative">
                   <User
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
                   />
 
                   <input
@@ -382,7 +397,7 @@ export default function PermissionRequestForm() {
                     autoComplete="name"
                     className={fieldClass(
                       Boolean(getError("name")),
-                      "pl-11 pr-4",
+                      "h-12 pl-11 pr-4 rounded-xl border-slate-200 bg-slate-50/70 transition-all focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:focus:bg-slate-800",
                     )}
                     value={formData.name}
                     onBlur={() => markTouched("name")}
@@ -393,25 +408,26 @@ export default function PermissionRequestForm() {
                 <FieldError message={getError("name")} />
               </div>
 
-              <div className="space-y-1.5">
+              {/* Role */}
+              <div className="space-y-2">
                 <label
                   htmlFor="role"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
+                  className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                 >
                   តួនាទី <span className="text-rose-500">*</span>
                 </label>
 
                 <div className="relative">
                   <Briefcase
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
                   />
 
                   <select
                     id="role"
                     className={fieldClass(
                       Boolean(getError("role")),
-                      "pl-11 pr-11 appearance-none cursor-pointer",
+                      "h-12 pl-11 pr-11 appearance-none cursor-pointer rounded-xl border-slate-200 bg-slate-50/70 transition-all focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:focus:bg-slate-800",
                     )}
                     value={formData.role}
                     onBlur={() => markTouched("role")}
@@ -429,19 +445,20 @@ export default function PermissionRequestForm() {
                   </select>
 
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                   />
                 </div>
 
                 <FieldError message={getError("role")} />
               </div>
 
+              {/* Custom Role */}
               {formData.role === "ផ្សេងៗ" && (
-                <div className="space-y-1.5 sm:col-span-2">
+                <div className="space-y-2 sm:col-span-2">
                   <label
                     htmlFor="customRole"
-                    className="block text-sm sm:text-base font-semibold text-slate-700"
+                    className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                   >
                     បញ្ជាក់តួនាទីផ្សេងៗ <span className="text-rose-500">*</span>
                   </label>
@@ -450,7 +467,10 @@ export default function PermissionRequestForm() {
                     id="customRole"
                     type="text"
                     placeholder="សូមបញ្ចូលតួនាទីផ្សេងៗ..."
-                    className={fieldClass(Boolean(getError("customRole")))}
+                    className={fieldClass(
+                      Boolean(getError("customRole")),
+                      "h-12 rounded-xl bg-slate-50/70 dark:bg-slate-800/50",
+                    )}
                     value={formData.customRole}
                     onBlur={() => markTouched("customRole")}
                     onChange={(event) =>
@@ -462,25 +482,26 @@ export default function PermissionRequestForm() {
                 </div>
               )}
 
-              <div className="space-y-1.5 sm:col-span-2">
+              {/* Office */}
+              <div className="space-y-2 sm:col-span-2">
                 <label
                   htmlFor="office"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
+                  className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                 >
                   ការិយាល័យ <span className="text-rose-500">*</span>
                 </label>
 
                 <div className="relative">
                   <Building2
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
                   />
 
                   <select
                     id="office"
                     className={fieldClass(
                       Boolean(getError("office")),
-                      "pl-11 pr-11 appearance-none cursor-pointer",
+                      "h-12 pl-11 pr-11 appearance-none cursor-pointer rounded-xl border-slate-200 bg-slate-50/70 transition-all focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:focus:bg-slate-800",
                     )}
                     value={formData.office}
                     onBlur={() => markTouched("office")}
@@ -500,19 +521,22 @@ export default function PermissionRequestForm() {
                   </select>
 
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                   />
                 </div>
 
                 <FieldError message={getError("office")} />
 
                 {formData.office === "ផ្សេងៗ" && (
-                  <div className="pt-1.5">
+                  <div className="pt-1">
                     <input
                       type="text"
                       placeholder="សូមបញ្ចូលការិយាល័យផ្សេងៗ..."
-                      className={fieldClass(Boolean(getError("customOffice")))}
+                      className={fieldClass(
+                        Boolean(getError("customOffice")),
+                        "h-12 rounded-xl bg-slate-50/70 dark:bg-slate-800/50",
+                      )}
                       value={formData.customOffice}
                       onBlur={() => markTouched("customOffice")}
                       onChange={(event) =>
@@ -525,11 +549,11 @@ export default function PermissionRequestForm() {
                 )}
               </div>
 
-              {/* Leave Duration */}
-              <div className="space-y-1.5 sm:col-span-2">
+              {/* Duration */}
+              <div className="space-y-2 sm:col-span-2">
                 <label
                   htmlFor="leaveDuration"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
+                  className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                 >
                   ស្នើសុំអនុញ្ញាតច្បាប់ (ចំនួនថ្ងៃ){" "}
                   <span className="text-rose-500">*</span>
@@ -537,15 +561,15 @@ export default function PermissionRequestForm() {
 
                 <div className="relative">
                   <Clock
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
                   />
 
                   <select
                     id="leaveDuration"
                     className={fieldClass(
                       Boolean(getError("leaveDuration")),
-                      "pl-11 pr-11 appearance-none cursor-pointer",
+                      "h-12 pl-11 pr-11 appearance-none cursor-pointer rounded-xl border-slate-200 bg-slate-50/70 transition-all focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:focus:bg-slate-800",
                     )}
                     value={formData.leaveDuration}
                     onBlur={() => markTouched("leaveDuration")}
@@ -565,20 +589,21 @@ export default function PermissionRequestForm() {
                   </select>
 
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
+                    size={18}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                   />
                 </div>
 
                 <FieldError message={getError("leaveDuration")} />
 
                 {formData.leaveDuration === "ផ្សេងៗ" && (
-                  <div className="pt-1.5">
+                  <div className="pt-1">
                     <input
                       type="text"
-                      placeholder="សូមបញ្ជាក់រយៈពេលផ្សេងៗ (ឧទាហរណ៍ 10 ថ្ងៃ)..."
+                      placeholder="សូមបញ្ជាក់រយៈពេលផ្សេងៗ..."
                       className={fieldClass(
                         Boolean(getError("customLeaveDuration")),
+                        "h-12 rounded-xl bg-slate-50/70 dark:bg-slate-800/50",
                       )}
                       value={formData.customLeaveDuration}
                       onBlur={() => markTouched("customLeaveDuration")}
@@ -592,99 +617,109 @@ export default function PermissionRequestForm() {
                 )}
               </div>
 
-              {/* Start Date */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="startDate"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
-                >
-                  ចាប់ពីថ្ងៃទី <span className="text-rose-500">*</span>
-                </label>
+              {/* Date Range */}
+              <div className="sm:col-span-2">
+                <div className="mb-3 flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                    <Calendar size={15} />
+                  </div>
 
-                <div className="relative">
-                  <Calendar
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
-                  />
-
-                  <input
-                    id="startDate"
-                    type="date"
-                    className={fieldClass(
-                      Boolean(getError("startDate")),
-                      "pl-11 pr-11 w-full cursor-pointer appearance-none",
-                    )}
-                    value={formData.startDate}
-                    onBlur={() => markTouched("startDate")}
-                    onChange={(event) =>
-                      updateData("startDate", event.target.value)
-                    }
-                  />
-
-                  <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={17}
-                  />
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                    រយៈពេលស្នើសុំ
+                  </span>
                 </div>
 
-                <FieldError message={getError("startDate")} />
-              </div>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  {/* Start */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="startDate"
+                      className="block text-sm font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      ចាប់ពីថ្ងៃទី <span className="text-rose-500">*</span>
+                    </label>
 
-              {/* End Date */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="endDate"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
-                >
-                  ដល់ថ្ងៃទី <span className="text-rose-500">*</span>
-                </label>
+                    <div className="relative">
+                      <Calendar
+                        size={18}
+                        className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
+                      />
 
-                <div className="relative">
-                  <Calendar
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={19}
-                  />
+                      <input
+                        id="startDate"
+                        type="date"
+                        className={fieldClass(
+                          Boolean(getError("startDate")),
+                          "h-12 w-full cursor-pointer appearance-none rounded-xl bg-slate-50/70 pl-11 pr-4 dark:bg-slate-800/50",
+                        )}
+                        value={formData.startDate}
+                        onBlur={() => markTouched("startDate")}
+                        onChange={(event) =>
+                          updateData("startDate", event.target.value)
+                        }
+                      />
+                    </div>
 
-                  <input
-                    id="endDate"
-                    type="date"
-                    min={formData.startDate}
-                    className={fieldClass(
-                      Boolean(getError("endDate")),
-                      "pl-11 pr-11 w-full cursor-pointer appearance-none",
-                    )}
-                    value={formData.endDate}
-                    onBlur={() => markTouched("endDate")}
-                    onChange={(event) =>
-                      updateData("endDate", event.target.value)
-                    }
-                  />
+                    <FieldError message={getError("startDate")} />
+                  </div>
 
-                  <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-                    size={17}
-                  />
+                  {/* End */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="endDate"
+                      className="block text-sm font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      ដល់ថ្ងៃទី <span className="text-rose-500">*</span>
+                    </label>
+
+                    <div className="relative">
+                      <Calendar
+                        size={18}
+                        className="absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-slate-400"
+                      />
+
+                      <input
+                        id="endDate"
+                        type="date"
+                        min={formData.startDate}
+                        className={fieldClass(
+                          Boolean(getError("endDate")),
+                          "h-12 w-full cursor-pointer appearance-none rounded-xl bg-slate-50/70 pl-11 pr-4 dark:bg-slate-800/50",
+                        )}
+                        value={formData.endDate}
+                        onBlur={() => markTouched("endDate")}
+                        onChange={(event) =>
+                          updateData("endDate", event.target.value)
+                        }
+                      />
+                    </div>
+
+                    <FieldError message={getError("endDate")} />
+                  </div>
                 </div>
-
-                <FieldError message={getError("endDate")} />
               </div>
 
+              {/* Warning */}
               {durationMismatchWarning && (
-                <div className="sm:col-span-2 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 flex items-start gap-2.5 text-amber-800 text-sm leading-relaxed">
-                  <AlertTriangle
-                    size={18}
-                    className="shrink-0 mt-0.5 text-amber-600"
-                  />
+                <div className="sm:col-span-2">
+                  <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3.5 text-sm text-amber-800 dark:border-amber-800/60 dark:from-amber-950/30 dark:to-orange-950/20 dark:text-amber-300">
+                    <AlertTriangle
+                      size={18}
+                      className="mt-0.5 shrink-0 text-amber-500"
+                    />
 
-                  <span>{durationMismatchWarning}</span>
+                    <span className="leading-relaxed">
+                      {durationMismatchWarning}
+                    </span>
+                  </div>
                 </div>
               )}
 
               {/* Made At */}
-              <div className="space-y-1.5 sm:col-span-2">
+              <div className="space-y-2 sm:col-span-2">
                 <label
                   htmlFor="madeAt"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
+                  className="block text-sm font-bold text-slate-700 dark:text-slate-200"
                 >
                   ធ្វើនៅថ្ងៃទី
                 </label>
@@ -693,69 +728,75 @@ export default function PermissionRequestForm() {
                   id="madeAt"
                   type="text"
                   disabled
-                  className={fieldClass(false)}
+                  className={fieldClass(
+                    false,
+                    "h-12 rounded-xl bg-slate-100/80 text-slate-500 dark:bg-slate-800/70 dark:text-slate-400",
+                  )}
                   value={madeAt}
-                  onBlur={() => markTouched("madeAt")}
-                  onChange={(event) => setMadeAt(event.target.value)}
                 />
               </div>
 
               {/* Reason */}
-              <div className="space-y-1.5 sm:col-span-2">
-                <label
-                  htmlFor="reason"
-                  className="block text-sm sm:text-base font-semibold text-slate-700"
-                >
-                  មូលហេតុ <span className="text-rose-500">*</span>
-                </label>
+              <div className="space-y-2 sm:col-span-2">
+                <div className="flex items-center justify-between gap-3">
+                  <label
+                    htmlFor="reason"
+                    className="block text-sm font-bold text-slate-700 dark:text-slate-200"
+                  >
+                    មូលហេតុ <span className="text-rose-500">*</span>
+                  </label>
+
+                  <span className="text-xs font-medium text-slate-400">
+                    {formData.reason.trim().length} តួអក្សរ
+                  </span>
+                </div>
 
                 <textarea
                   id="reason"
-                  rows={3}
+                  rows={4}
                   placeholder="បញ្ចូលមូលហេតុស្នើសុំច្បាប់..."
                   className={fieldClass(
                     Boolean(getError("reason")),
-                    "h-32 sm:h-28 py-3 resize-none leading-relaxed",
+                    "min-h-32 resize-none rounded-2xl bg-slate-50/70 py-3.5 leading-relaxed transition-all focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-800/50 dark:focus:bg-slate-800",
                   )}
                   value={formData.reason}
                   onBlur={() => markTouched("reason")}
                   onChange={(event) => updateData("reason", event.target.value)}
                 />
 
-                <div className="flex items-start justify-between gap-3 text-xs text-slate-500">
-                  <FieldError message={getError("reason")} />
-
-                  <span className="ml-auto shrink-0 text-sm text-slate-500">
-                    {formData.reason.trim().length} តួអក្សរ
-                  </span>
-                </div>
+                <FieldError message={getError("reason")} />
               </div>
             </div>
 
+            {/* Submit Error */}
             {submitError && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 flex items-start gap-2.5 text-rose-700 text-sm leading-relaxed">
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <div className="mt-5 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3.5 text-sm text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/30 dark:text-rose-300">
+                <AlertCircle size={18} className="mt-0.5 shrink-0" />
 
-                <span>{submitError}</span>
+                <span className="leading-relaxed">{submitError}</span>
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-3 w-full">
+            {/* Submit */}
+            <div className="mt-6 border-t border-slate-100 pt-5 dark:border-slate-800">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:flex-1 h-14 sm:h-12 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 text-white font-semibold text-base shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 hover:from-sky-700 hover:to-sky-800 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
+                className="group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/25 active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:h-13 sm:text-base"
               >
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={20} className="animate-spin" />
-
+                    <Loader2 size={19} className="animate-spin" />
                     <span>កំពុងបញ្ជូន...</span>
                   </>
                 ) : (
                   <>
-                    <Send size={20} />
-
+                    <Send
+                      size={19}
+                      className="transition-transform duration-200 group-hover:translate-x-0.5"
+                    />
                     <span>បញ្ជូនសំណើ</span>
                   </>
                 )}
