@@ -21,7 +21,7 @@ export default function App() {
               <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-xs animate-pulse" />
             </div>
             <div className="min-w-0">
-              <h2 className="font-extrabold text-slate-950 dark:text-white text-base sm:text-lg leading-snug truncate tracking-tight">
+              <h2 className="font-extrabold text-slate-950 dark:text-white text-base sm:text-xl leading-snug truncate tracking-tight">
                 នាយកដ្ឋានមុខងារ និងធនធាន
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
@@ -35,7 +35,7 @@ export default function App() {
             href="https://t.me/vichea_chann"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-blue-700 dark:bg-blue-600 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 hover:bg-blue-700/80 dark:hover:bg-blue-500 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-blue-600 bg-transparent px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-blue-700 transition-all duration-200 hover:bg-blue-50 hover:border-blue-700 hover:text-blue-800 active:scale-[0.98] dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-950/40 dark:hover:border-blue-400 dark:hover:text-blue-300"
           >
             <svg
               className="w-4 h-4 opacity-90"
@@ -50,7 +50,10 @@ export default function App() {
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
-            <span>ទំនាក់ទំនងជំនួយ</span>
+
+            <span className="font-extrabold text-slate-950 dark:text-white text-base sm:text-md leading-snug truncate tracking-tight">
+              ទំនាក់ទំនងជំនួយ
+            </span>
           </a>
         </div>
       </header>

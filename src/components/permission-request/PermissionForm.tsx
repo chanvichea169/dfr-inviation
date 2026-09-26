@@ -14,16 +14,19 @@ import {
   Send,
   User,
 } from "lucide-react";
+
 import type {
   FieldKey,
   PermissionRequestData,
 } from "../../types/permission-request";
+
 import {
   DURATION_OPTIONS,
   EMPTY_FORM_DATA,
   OFFICES,
   ROLES,
 } from "../../constants/permission-request";
+
 import {
   buildRequestText,
   fieldClass,
@@ -36,6 +39,7 @@ import {
   parseNumericDuration,
   todayInputValue,
 } from "../../lib/utils/permission-request";
+
 import { FieldError } from "./FieldError";
 import { SuccessView } from "./SuccessView";
 
@@ -45,42 +49,65 @@ export default function PermissionRequestForm() {
     startDate: todayInputValue(),
     endDate: todayInputValue(),
   });
+
   const [madeAt, setMadeAt] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
   const [touchedFields, setTouchedFields] = useState<Set<FieldKey>>(new Set());
+
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   useEffect(() => {
     setMadeAt(formatMadeAt(new Date()));
   }, []);
 
+  /*
+   * Date range between start date and end date.
+   * This is NOT the header total day.
+   * It is only used to check whether the selected leave duration
+   * fits inside the selected date range.
+   */
   const totalCalendarDays = useMemo(
     () => getInclusiveDays(formData.startDate, formData.endDate),
     [formData.startDate, formData.endDate],
   );
 
-  const selectedDurationDays = useMemo(
-    () => parseNumericDuration(getEffectiveDuration(formData)),
-    [formData],
-  );
+  /*
+   * Header Total Days.
+   *
+   * This value depends directly on the leaveDuration select.
+   *
+   * Example:
+   * "24 ថ្ងៃ" -> 24
+   * "15 ថ្ងៃ" -> 15
+   * "7 ថ្ងៃ"  -> 7
+   */
+  const selectedTotalDays = useMemo(() => {
+    const duration = getEffectiveDuration(formData);
+
+    return parseNumericDuration(duration);
+  }, [formData]);
 
   const durationMismatchWarning = useMemo(() => {
     if (
       totalCalendarDays !== null &&
-      selectedDurationDays !== null &&
-      selectedDurationDays > totalCalendarDays
+      selectedTotalDays !== null &&
+      selectedTotalDays > totalCalendarDays
     ) {
-      return `ការស្នើសុំចំនួន ${selectedDurationDays} ថ្ងៃ គឺលើសពីចន្លោះថ្ងៃបរិច្ឆេទដែលបានជ្រើសរើស (សរុបមានតែ ${totalCalendarDays} ថ្ងៃប៉ុណ្ណោះ)។`;
+      return `ការស្នើសុំចំនួន ${selectedTotalDays} ថ្ងៃ គឺលើសពីចន្លោះថ្ងៃបរិច្ឆេទដែលបានជ្រើសរើស (សរុបមានតែ ${totalCalendarDays} ថ្ងៃប៉ុណ្ណោះ)។`;
     }
+
     return null;
-  }, [totalCalendarDays, selectedDurationDays]);
+  }, [totalCalendarDays, selectedTotalDays]);
 
   const validationErrors = useMemo(() => {
     const errors: Partial<Record<FieldKey, string>> = {};
 
-    if (!formData.name.trim()) errors.name = "សូមបញ្ចូលឈ្មោះ";
+    if (!formData.name.trim()) {
+      errors.name = "សូមបញ្ចូលឈ្មោះ";
+    }
 
     if (!formData.role) {
       errors.role = "សូមជ្រើសរើសតួនាទី";
@@ -103,19 +130,27 @@ export default function PermissionRequestForm() {
       errors.customLeaveDuration = "សូមបញ្ចូលរយៈពេលផ្សេងៗ";
     }
 
-    if (!formData.startDate) errors.startDate = "សូមជ្រើសរើសថ្ងៃចាប់ផ្តើម";
-    if (!formData.endDate) errors.endDate = "សូមជ្រើសរើសថ្ងៃបញ្ចប់";
+    if (!formData.startDate) {
+      errors.startDate = "សូមជ្រើសរើសថ្ងៃចាប់ផ្តើម";
+    }
+
+    if (!formData.endDate) {
+      errors.endDate = "សូមជ្រើសរើសថ្ងៃបញ្ចប់";
+    }
 
     if (formData.startDate && formData.endDate && totalCalendarDays === null) {
       errors.endDate = "ថ្ងៃបញ្ចប់ត្រូវនៅក្រោយថ្ងៃចាប់ផ្តើម";
     }
 
-    if (!formData.reason.trim()) errors.reason = "សូមបញ្ចូលមូលហេតុ";
+    if (!formData.reason.trim()) {
+      errors.reason = "សូមបញ្ចូលមូលហេតុ";
+    }
 
     return errors;
   }, [formData, totalCalendarDays]);
 
   const hasErrors = Object.keys(validationErrors).length > 0;
+
   const permissionText = useMemo(
     () => buildRequestText(formData, madeAt),
     [formData, madeAt],
@@ -132,35 +167,60 @@ export default function PermissionRequestForm() {
     value: PermissionRequestData[K],
   ) => {
     setFormData((prev) => {
-      const next = { ...prev, [field]: value };
+      const next = {
+        ...prev,
+        [field]: value,
+      };
+
       if (field === "startDate" && next.endDate && value > next.endDate) {
         next.endDate = value;
       }
+
       if (field === "role" && value !== "ផ្សេងៗ") {
         next.customRole = "";
       }
+
+      if (field === "office" && value !== "ផ្សេងៗ") {
+        next.customOffice = "";
+      }
+
+      if (field === "leaveDuration" && value !== "ផ្សេងៗ") {
+        next.customLeaveDuration = "";
+      }
+
       return next;
     });
   };
 
   const markTouched = (field: FieldKey) => {
-    setTouchedFields((prev) => new Set(prev).add(field));
+    setTouchedFields((prev) => {
+      const next = new Set(prev);
+      next.add(field);
+      return next;
+    });
   };
 
   const refreshMadeAt = () => {
     const nextMadeAt = formatMadeAt(new Date());
     setMadeAt(nextMadeAt);
+
     return nextMadeAt;
   };
 
   const handleDownloadPdf = () => {
     const currentMadeAt = refreshMadeAt();
+
     const originalTitle = document.title;
+
     const safeName = (formData.name || "permission-request")
       .trim()
       .replace(/\s+/g, "-");
 
-    document.title = `permission-request-${safeName}-${currentMadeAt.replace(/[/:\s]/g, "-")}`;
+    document.title = `permission-request-${safeName}-${currentMadeAt.replace(
+      /[/:\s]/g,
+      "-",
+    )}`;
+
     window.print();
 
     window.setTimeout(() => {
@@ -174,6 +234,7 @@ export default function PermissionRequestForm() {
       startDate: todayInputValue(),
       endDate: todayInputValue(),
     });
+
     setMadeAt(formatMadeAt(new Date()));
     setIsSubmitted(false);
     setSubmitError(null);
@@ -183,6 +244,7 @@ export default function PermissionRequestForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     setSubmitAttempted(true);
 
     if (hasErrors) {
@@ -194,6 +256,7 @@ export default function PermissionRequestForm() {
     setSubmitError(null);
 
     const currentMadeAt = refreshMadeAt();
+
     const requestText = buildRequestText(formData, currentMadeAt);
 
     const payload = {
@@ -210,7 +273,9 @@ export default function PermissionRequestForm() {
     try {
       const res = await fetch("/api/invitation", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -228,11 +293,12 @@ export default function PermissionRequestForm() {
       }
 
       setIsSubmitted(true);
-    } catch (err) {
+    } catch (error) {
       const message =
-        err instanceof Error
-          ? err.message
+        error instanceof Error
+          ? error.message
           : "មិនអាចរក្សាទុកទិន្នន័យបានទេ។ សូមព្យាយាមម្ដងទៀត។";
+
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
@@ -252,19 +318,21 @@ export default function PermissionRequestForm() {
   }
 
   return (
-    <div className="w-full max-w-none mx-auto sm:px-6 py-6 sm:py-8">
+    <div className="w-full max-w-none mx-auto px-3 sm:px-6 py-4 sm:py-8">
       <form onSubmit={handleSubmit}>
         <section className="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-          <div className="border-b border-slate-200/80 bg-slate-50/70 px-5 sm:px-7 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3.5">
+          <div className="border-b border-slate-200/80 bg-slate-50/70 px-4 sm:px-7 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm shrink-0">
                 <FileText size={22} />
               </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-950">
+
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-2xl font-bold text-slate-950 leading-snug">
                   លិខិតស្នើសុំអនុញ្ញាតច្បាប់
                 </h2>
-                <p className="text-sm sm:text-base text-slate-500">
+
+                <p className="text-sm sm:text-base text-slate-500 leading-relaxed">
                   ព័ត៌មានស្នើសុំ និងការផ្ទៀងផ្ទាត់មុនបញ្ជូន
                 </p>
               </div>
@@ -272,10 +340,11 @@ export default function PermissionRequestForm() {
 
             <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600">
               <span className="rounded-full bg-white border border-slate-200 px-3 py-1 shadow-2xs">
-                {totalCalendarDays
-                  ? `${totalCalendarDays} ថ្ងៃ`
+                {selectedTotalDays !== null
+                  ? `${selectedTotalDays} ថ្ងៃ`
                   : "មិនទាន់កំណត់"}
               </span>
+
               <span
                 className={`rounded-full border px-3 py-1 ${
                   hasErrors || Boolean(durationMismatchWarning)
@@ -290,9 +359,8 @@ export default function PermissionRequestForm() {
             </div>
           </div>
 
-          <div className="p-5 sm:p-7 space-y-6">
+          <div className="p-4 sm:p-7 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* ឈ្មោះ */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="name"
@@ -300,26 +368,31 @@ export default function PermissionRequestForm() {
                 >
                   ឈ្មោះ <span className="text-rose-500">*</span>
                 </label>
+
                 <div className="relative">
                   <User
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                    size={18}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
+
                   <input
                     id="name"
                     type="text"
                     placeholder="បញ្ចូលឈ្មោះ..."
                     autoComplete="name"
-                    className={fieldClass(Boolean(getError("name")), "pl-10")}
+                    className={fieldClass(
+                      Boolean(getError("name")),
+                      "pl-11 pr-4",
+                    )}
                     value={formData.name}
                     onBlur={() => markTouched("name")}
                     onChange={(event) => updateData("name", event.target.value)}
                   />
                 </div>
+
                 <FieldError message={getError("name")} />
               </div>
 
-              {/* តួនាទី */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="role"
@@ -327,16 +400,18 @@ export default function PermissionRequestForm() {
                 >
                   តួនាទី <span className="text-rose-500">*</span>
                 </label>
+
                 <div className="relative">
                   <Briefcase
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
+
                   <select
                     id="role"
                     className={fieldClass(
                       Boolean(getError("role")),
-                      "pl-10 pr-10 appearance-none cursor-pointer",
+                      "pl-11 pr-11 appearance-none cursor-pointer",
                     )}
                     value={formData.role}
                     onBlur={() => markTouched("role")}
@@ -345,21 +420,23 @@ export default function PermissionRequestForm() {
                     <option value="" disabled>
                       ជ្រើសរើសតួនាទី
                     </option>
+
                     {ROLES.map((role) => (
                       <option key={role} value={role}>
                         {role}
                       </option>
                     ))}
                   </select>
+
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
                 </div>
+
                 <FieldError message={getError("role")} />
               </div>
 
-              {/* តួនាទីផ្សេងៗ (Full Width) */}
               {formData.role === "ផ្សេងៗ" && (
                 <div className="space-y-1.5 sm:col-span-2">
                   <label
@@ -368,23 +445,23 @@ export default function PermissionRequestForm() {
                   >
                     បញ្ជាក់តួនាទីផ្សេងៗ <span className="text-rose-500">*</span>
                   </label>
+
                   <input
                     id="customRole"
                     type="text"
                     placeholder="សូមបញ្ចូលតួនាទីផ្សេងៗ..."
-                    className={fieldClass(
-                      Boolean(getError("customRole")),
-                      "w-full",
-                    )}
+                    className={fieldClass(Boolean(getError("customRole")))}
                     value={formData.customRole}
                     onBlur={() => markTouched("customRole")}
-                    onChange={(e) => updateData("customRole", e.target.value)}
+                    onChange={(event) =>
+                      updateData("customRole", event.target.value)
+                    }
                   />
+
                   <FieldError message={getError("customRole")} />
                 </div>
               )}
 
-              {/* ការិយាល័យ */}
               <div className="space-y-1.5 sm:col-span-2">
                 <label
                   htmlFor="office"
@@ -392,16 +469,18 @@ export default function PermissionRequestForm() {
                 >
                   ការិយាល័យ <span className="text-rose-500">*</span>
                 </label>
+
                 <div className="relative">
                   <Building2
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
+
                   <select
                     id="office"
                     className={fieldClass(
                       Boolean(getError("office")),
-                      "pl-10 pr-10 appearance-none cursor-pointer",
+                      "pl-11 pr-11 appearance-none cursor-pointer",
                     )}
                     value={formData.office}
                     onBlur={() => markTouched("office")}
@@ -412,17 +491,20 @@ export default function PermissionRequestForm() {
                     <option value="" disabled>
                       ជ្រើសរើសការិយាល័យ
                     </option>
+
                     {OFFICES.map((office) => (
                       <option key={office} value={office}>
                         {office}
                       </option>
                     ))}
                   </select>
+
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
                 </div>
+
                 <FieldError message={getError("office")} />
 
                 {formData.office === "ផ្សេងៗ" && (
@@ -430,22 +512,20 @@ export default function PermissionRequestForm() {
                     <input
                       type="text"
                       placeholder="សូមបញ្ចូលការិយាល័យផ្សេងៗ..."
-                      className={fieldClass(
-                        Boolean(getError("customOffice")),
-                        "w-full",
-                      )}
+                      className={fieldClass(Boolean(getError("customOffice")))}
                       value={formData.customOffice}
                       onBlur={() => markTouched("customOffice")}
-                      onChange={(e) =>
-                        updateData("customOffice", e.target.value)
+                      onChange={(event) =>
+                        updateData("customOffice", event.target.value)
                       }
                     />
+
                     <FieldError message={getError("customOffice")} />
                   </div>
                 )}
               </div>
 
-              {/* ស្នើសុំអនុញ្ញាតច្បាប់ (Dropdown Select) */}
+              {/* Leave Duration */}
               <div className="space-y-1.5 sm:col-span-2">
                 <label
                   htmlFor="leaveDuration"
@@ -454,16 +534,18 @@ export default function PermissionRequestForm() {
                   ស្នើសុំអនុញ្ញាតច្បាប់ (ចំនួនថ្ងៃ){" "}
                   <span className="text-rose-500">*</span>
                 </label>
+
                 <div className="relative">
                   <Clock
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
+
                   <select
                     id="leaveDuration"
                     className={fieldClass(
                       Boolean(getError("leaveDuration")),
-                      "pl-10 pr-10 appearance-none cursor-pointer",
+                      "pl-11 pr-11 appearance-none cursor-pointer",
                     )}
                     value={formData.leaveDuration}
                     onBlur={() => markTouched("leaveDuration")}
@@ -474,17 +556,20 @@ export default function PermissionRequestForm() {
                     <option value="" disabled>
                       ជ្រើសរើសចំនួនថ្ងៃ/រយៈពេល
                     </option>
+
                     {DURATION_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
                         {opt}
                       </option>
                     ))}
                   </select>
+
                   <ChevronDown
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={18}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
                   />
                 </div>
+
                 <FieldError message={getError("leaveDuration")} />
 
                 {formData.leaveDuration === "ផ្សេងៗ" && (
@@ -494,20 +579,20 @@ export default function PermissionRequestForm() {
                       placeholder="សូមបញ្ជាក់រយៈពេលផ្សេងៗ (ឧទាហរណ៍ 10 ថ្ងៃ)..."
                       className={fieldClass(
                         Boolean(getError("customLeaveDuration")),
-                        "w-full",
                       )}
                       value={formData.customLeaveDuration}
                       onBlur={() => markTouched("customLeaveDuration")}
-                      onChange={(e) =>
-                        updateData("customLeaveDuration", e.target.value)
+                      onChange={(event) =>
+                        updateData("customLeaveDuration", event.target.value)
                       }
                     />
+
                     <FieldError message={getError("customLeaveDuration")} />
                   </div>
                 )}
               </div>
 
-              {/* ចាប់ពីថ្ងៃទី */}
+              {/* Start Date */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="startDate"
@@ -515,31 +600,37 @@ export default function PermissionRequestForm() {
                 >
                   ចាប់ពីថ្ងៃទី <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
-                    <Calendar size={18} />
-                  </span>
+
+                <div className="relative">
+                  <Calendar
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
+                  />
+
                   <input
                     id="startDate"
                     type="date"
-                    className={`${fieldClass(
+                    className={fieldClass(
                       Boolean(getError("startDate")),
-                      "pl-10 pr-10 w-full cursor-pointer",
-                    )}`}
+                      "pl-11 pr-11 w-full cursor-pointer appearance-none",
+                    )}
                     value={formData.startDate}
                     onBlur={() => markTouched("startDate")}
                     onChange={(event) =>
                       updateData("startDate", event.target.value)
                     }
                   />
-                  <span className="absolute right-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
-                    <ChevronDown size={16} />
-                  </span>
+
+                  <ChevronDown
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={17}
+                  />
                 </div>
+
                 <FieldError message={getError("startDate")} />
               </div>
 
-              {/* ដល់ថ្ងៃទី */}
+              {/* End Date */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="endDate"
@@ -547,43 +638,49 @@ export default function PermissionRequestForm() {
                 >
                   ដល់ថ្ងៃទី <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
-                    <Calendar size={18} />
-                  </span>
+
+                <div className="relative">
+                  <Calendar
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={19}
+                  />
+
                   <input
                     id="endDate"
                     type="date"
                     min={formData.startDate}
-                    className={`${fieldClass(
+                    className={fieldClass(
                       Boolean(getError("endDate")),
-                      "pl-10 pr-10 w-full cursor-pointer",
-                    )}`}
+                      "pl-11 pr-11 w-full cursor-pointer appearance-none",
+                    )}
                     value={formData.endDate}
                     onBlur={() => markTouched("endDate")}
                     onChange={(event) =>
                       updateData("endDate", event.target.value)
                     }
                   />
-                  <span className="absolute right-3.5 text-slate-400 pointer-events-none z-10 flex items-center">
-                    <ChevronDown size={16} />
-                  </span>
+
+                  <ChevronDown
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+                    size={17}
+                  />
                 </div>
+
                 <FieldError message={getError("endDate")} />
               </div>
 
-              {/* Duration Mismatch Warning */}
               {durationMismatchWarning && (
-                <div className="sm:col-span-2 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 flex items-start gap-2.5 text-amber-800 text-sm">
+                <div className="sm:col-span-2 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 flex items-start gap-2.5 text-amber-800 text-sm leading-relaxed">
                   <AlertTriangle
                     size={18}
                     className="shrink-0 mt-0.5 text-amber-600"
                   />
+
                   <span>{durationMismatchWarning}</span>
                 </div>
               )}
 
-              {/* ធ្វើនៅថ្ងៃទី */}
+              {/* Made At */}
               <div className="space-y-1.5 sm:col-span-2">
                 <label
                   htmlFor="madeAt"
@@ -591,6 +688,7 @@ export default function PermissionRequestForm() {
                 >
                   ធ្វើនៅថ្ងៃទី
                 </label>
+
                 <input
                   id="madeAt"
                   type="text"
@@ -602,7 +700,7 @@ export default function PermissionRequestForm() {
                 />
               </div>
 
-              {/* មូលហេតុ */}
+              {/* Reason */}
               <div className="space-y-1.5 sm:col-span-2">
                 <label
                   htmlFor="reason"
@@ -610,31 +708,34 @@ export default function PermissionRequestForm() {
                 >
                   មូលហេតុ <span className="text-rose-500">*</span>
                 </label>
+
                 <textarea
                   id="reason"
                   rows={3}
                   placeholder="បញ្ចូលមូលហេតុស្នើសុំច្បាប់..."
                   className={fieldClass(
                     Boolean(getError("reason")),
-                    "h-auto py-3 resize-none leading-relaxed",
+                    "h-32 sm:h-28 py-3 resize-none leading-relaxed",
                   )}
                   value={formData.reason}
                   onBlur={() => markTouched("reason")}
                   onChange={(event) => updateData("reason", event.target.value)}
                 />
-                <div className="flex items-center justify-between gap-3 text-xs text-slate-500 pt-0.5">
+
+                <div className="flex items-start justify-between gap-3 text-xs text-slate-500">
                   <FieldError message={getError("reason")} />
-                  <span className="ml-auto font-siemreab text-sm text-slate-500">
-                    {formData.reason ? formData.reason.trim().length : 0}{" "}
-                    តួអក្សរ
+
+                  <span className="ml-auto shrink-0 text-sm text-slate-500">
+                    {formData.reason.trim().length} តួអក្សរ
                   </span>
                 </div>
               </div>
             </div>
 
             {submitError && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 flex items-start gap-2.5 text-rose-700 text-sm">
+              <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 flex items-start gap-2.5 text-rose-700 text-sm leading-relaxed">
                 <AlertCircle size={18} className="shrink-0 mt-0.5" />
+
                 <span>{submitError}</span>
               </div>
             )}
@@ -643,16 +744,18 @@ export default function PermissionRequestForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:flex-1 h-11 sm:h-12 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 text-white font-semibold text-base shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 hover:from-sky-700 hover:to-sky-800 disabled:opacity-50"
+                className="w-full sm:flex-1 h-14 sm:h-12 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 text-white font-semibold text-base shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 hover:from-sky-700 hover:to-sky-800 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={18} className="animate-spin" />
+                    <Loader2 size={20} className="animate-spin" />
+
                     <span>កំពុងបញ្ជូន...</span>
                   </>
                 ) : (
                   <>
-                    <Send size={18} />
+                    <Send size={20} />
+
                     <span>បញ្ជូនសំណើ</span>
                   </>
                 )}

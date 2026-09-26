@@ -67,21 +67,22 @@ export function SuccessView({
           <button
             type="button"
             onClick={onDownloadPdf}
-            className="flex-1 h-12 px-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base rounded-xl shadow-md hover:shadow-xl shadow-slate-900/10 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2.5 group"
+            className="flex-1 min-h-[52px] sm:h-12 px-6 sm:px-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base rounded-xl shadow-md hover:shadow-xl shadow-slate-900/10 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2.5 group"
           >
             <Download
-              size={18}
+              size={20}
               className="transition-transform duration-200 group-hover:-translate-y-0.5"
             />
             ទាញយកជា PDF
           </button>
+
           <button
             type="button"
             onClick={onReset}
-            className="flex-1 h-13 px-6 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-base rounded-xl transition-all duration-200 hover:border-slate-300 active:scale-[0.98] flex items-center justify-center gap-2.5"
+            className="flex-1 min-h-[52px] sm:h-12 px-6 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-base rounded-xl transition-all duration-200 hover:border-slate-300 active:scale-[0.98] flex items-center justify-center gap-2.5"
           >
             <RotateCcw
-              size={18}
+              size={20}
               className="transition-transform duration-300 hover:-rotate-45"
             />
             បង្កើតថ្មីម្ដងទៀត
